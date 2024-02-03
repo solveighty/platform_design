@@ -163,15 +163,15 @@ Widget _buildIosHomePage(BuildContext context) {
       items: const [
         BottomNavigationBarItem(
           label: SongsTab.title,
-          icon: SongsTab.iosIcon,
+          icon: Icon(Icons.assistant_outlined),
         ),
         BottomNavigationBarItem(
           label: NewsTab.title,
-          icon: NewsTab.iosIcon,
+          icon: Icon(Icons.add_a_photo_outlined)
         ),
         BottomNavigationBarItem(
           label: ProfileTab.title,
-          icon: ProfileTab.iosIcon,
+          icon: Icon(Icons.auto_awesome_mosaic_rounded),
         ),
       ],
     ),

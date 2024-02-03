@@ -5,11 +5,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:math';
 
-import 'song_detail_tab.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'utils.dart';
-import 'widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+String randomString() {
+  final random = Random.secure();
+  final values = List<int>.generate(16, (i) => random.nextInt(255));
+  return base64UrlEncode(values);
+}
 
 class SongsTab extends StatefulWidget {
   static const title = 'Menú Principal';
@@ -26,8 +33,42 @@ class SongsTab extends StatefulWidget {
 
 class _SongsTabState extends State<SongsTab> {
   static const _itemsLength = 50;
+  final List<types.Message> _messages = [];
+  final _user = const types.User(id: '82091008-a484-4a89-ae75-a22bf8d6f3ac');
+  bool _isEnabled = true;
 
-  final _androidRefreshKey = GlobalKey<RefreshIndicatorState>();
+  void _toggleEnabled() {
+    sendSugerir();
+    setState(() {
+      _isEnabled = !_isEnabled;
+    });
+  }
+
+  void sendSugerir() {
+    final sugerirMessage = types.TextMessage(
+      author: _user,
+      createdAt: DateTime
+          .now()
+          .millisecondsSinceEpoch,
+      id: randomString(),
+      text: "¿Cuál prenda o conjunto me sugieres para el día de hoy?",
+    );
+    _addMessage(sugerirMessage);
+    
+  }
+  void sendCombinacion() {
+    final sugerirMessage = types.TextMessage(
+      author: _user,
+      createdAt: DateTime
+          .now()
+          .millisecondsSinceEpoch,
+      id: randomString(),
+      text: "",
+    );
+    _addMessage(sugerirMessage);
+    
+  }
+
 
   late List<MaterialColor> colors;
   late List<String> songNames;
@@ -47,32 +88,10 @@ class _SongsTabState extends State<SongsTab> {
     return Future.delayed(
       // This is just an arbitrary delay that simulates some network activity.
       const Duration(seconds: 2),
-      () => setState(() => _setData()),
+          () => setState(() => _setData()),
     );
   }
 
-  Widget _listBuilder(BuildContext context) {
-    //return Container();
-
-    // Show a slightly different color palette. Show poppy-ier colors on iOS
-    // due to lighter contrasting bars and tone it down on Android.
-
-    return SafeArea(
-        top: false,
-        bottom: false,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Card(
-                  child: Text("Prueba"),
-                )
-              ],
-            )
-          ],
-        ));
-  }
 
   void _togglePlatform() {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -101,67 +120,110 @@ class _SongsTabState extends State<SongsTab> {
   // ===========================================================================
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          SongsTab.title,
-          style: TextStyle(fontSize: 25),
+        appBar: AppBar(
+          title: const Text(
+            SongsTab.title,
+            style: TextStyle(fontSize: 25),
+          ),
         ),
-      ),
-      drawer: widget.androidDrawer,
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                width: 190,
-                child: FilledButton(
-                    child: const Text('Sugerir',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                        textAlign: TextAlign.center),
-                    onPressed: () {}),
-              ),
-              Padding(padding: EdgeInsets.all(30.0))
-            ],
+        drawer: Drawer(
+          child: Drawer(
+            child: ListView(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.exit_to_app),
+                  title: Text("Cerrar sesion"),
+                  subtitle: Text("Salir en esta cuenta"),
+                ),
+              ],
+            ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                width: 190,
-                child: FilledButton(
-                    child: const Text('Combinación',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                        textAlign: TextAlign.center),
-                    onPressed: () {}),
-              ),
-              Padding(padding: EdgeInsets.all(30.0))
-            ],
-          ),
-        ],
-      ),
+        ),
+        body: Chat(
+          theme: const DefaultChatTheme(backgroundColor: Colors.black54),
+          messages: _messages,
+          onSendPressed: _handleSendPressed,
+          user: _user,
+        ),
+        persistentFooterButtons: [Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 180,
+                  child: FilledButton(
+                      child: const Text('Sugerir',
+                          style: TextStyle(
+                            fontSize: 17,
+                          ),
+                          textAlign: TextAlign.center),
+                      onPressed: _isEnabled ? _toggleEnabled : null),
+                ),
+                Padding(padding: EdgeInsets.all(0.0))
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 180,
+                  child: FilledButton(
+                      child: const Text('Combinación',
+                          style: TextStyle(
+                            fontSize: 17,
+                          ),
+                          textAlign: TextAlign.center),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context, 
+                          builder: (BuildContext context){
+                            return SizedBox(
+                              height: 400,
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Elije una prenda",
+                                      style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                                    )
+                                  ])
+                            );
+                        });
+
+                      }),
+                ),
+                Padding(padding: EdgeInsets.all(0.0))
+              ],
+            ),
+          ],
+        ),
+        ]
     );
   }
 
-  /*Widget _buildIos(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        Padding(padding: EdgeInsets.zero),
-        CupertinoSliverRefreshControl(
-          onRefresh: _refreshData,
-        ),
-        SliverBu
-      ],
+  void _addMessage(types.Message message) {
+    setState(() {
+      _messages.insert(0, message);
+    });
+  }
+
+  void _handleSendPressed(types.PartialText message) {
+    final textMessage = types.TextMessage(
+      author: _user,
+      createdAt: DateTime
+          .now()
+          .millisecondsSinceEpoch,
+      id: randomString(),
+      text: message.text,
     );
-  }*/
+    _addMessage(textMessage);
+  }
 
   @override
   Widget build(context) {
     return _buildAndroid(context);
   }
 }
+

@@ -9,7 +9,7 @@ import 'settings_tab.dart';
 import 'widgets.dart';
 
 class ProfileTab extends StatelessWidget {
-  static const title = 'Profile';
+  static const title = 'Galeria';
   static const androidIcon = Icon(Icons.person);
   static const iosIcon = Icon(CupertinoIcons.profile_circled);
 

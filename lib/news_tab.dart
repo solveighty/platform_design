@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lorem/flutter_lorem.dart';
 
 import 'utils.dart';
-import 'widgets.dart';
 
 class NewsTab extends StatefulWidget {
   static const title = 'Cámara';
