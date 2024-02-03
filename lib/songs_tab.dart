@@ -132,8 +132,8 @@ class _SongsTabState extends State<SongsTab> {
               children: <Widget>[
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
-                  title: Text("Cerrar sesion"),
-                  subtitle: Text("Salir en esta cuenta"),
+                  title: Text("Cerrar Sesión"),
+                  subtitle: Text("Salir de la cuenta"),
                 ),
               ],
             ),

@@ -2,16 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:platform_design/src/pages/startpage.dart';
+import 'firebase_options.dart';
 import 'news_tab.dart';
 import 'profile_tab.dart';
 import 'settings_tab.dart';
 import 'songs_tab.dart';
 import 'widgets.dart';
 
-void main() => runApp(const MyAdaptingApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyAdaptingApp());
+}
 
 class MyAdaptingApp extends StatelessWidget {
   const MyAdaptingApp({super.key});
@@ -21,7 +29,8 @@ class MyAdaptingApp extends StatelessWidget {
     // Either Material or Cupertino widgets work in either Material or Cupertino
     // Apps.
     return MaterialApp(
-      title: 'Adaptive Music App',
+      debugShowCheckedModeBanner: false,
+      title: 'Armario Inteligente',
       theme: ThemeData(
         // Use the green theme for Material widgets.
         primarySwatch: Colors.green,
@@ -37,7 +46,8 @@ class MyAdaptingApp extends StatelessWidget {
           child: Material(child: child),
         );
       },
-      home: _buildIosHomePage(context),
+      home: StartPageMonitoring(),
+      //home: _buildIosHomePage(context),
     );
   }
 }
