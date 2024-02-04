@@ -59,7 +59,7 @@ class _SongsTabState extends State<SongsTab> {
   }
 
   void sendUserPrompt(String message) async {
-    var url = Uri.parse('http://10.0.2.2:11434/api/generate');
+    var url = Uri.parse('https://asistentedemoda.loophole.site/api/generate');
     String nombre = 'Andrew';
     Map params = {'model': 'moda', 'prompt': '$message', 'stream': false};
     var body = json.encode(params);
@@ -77,7 +77,7 @@ class _SongsTabState extends State<SongsTab> {
   }
 
   void sendPrompt() async {
-    var url = Uri.parse('http://10.0.2.2:11434/api/generate');
+    var url = Uri.parse('https://asistentedemoda.loophole.site/api/generate');
     String nombre = 'Andrew';
     Map params = {
       'model': 'moda',

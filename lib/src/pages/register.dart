@@ -15,18 +15,15 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-
   final _usuario = TextEditingController();
   final _nombre = TextEditingController();
-  final _apellido = TextEditingController();
   final _correo = TextEditingController();
   final _contrasena = TextEditingController();
 
   @override
-  void dispose(){
+  void dispose() {
     _usuario.dispose();
     _nombre.dispose();
-    _apellido.dispose();
     _contrasena.dispose();
     _contrasena.dispose();
     super.dispose();
@@ -34,9 +31,8 @@ class _RegisterState extends State<Register> {
 
   FirebaseFirestore db = FirebaseFirestore.instance;
 
-
-
-  Future addUsers(String usuario, String nombre, String apellido, String correo, String contrasena) async {
+  Future addUsers(
+      String usuario, String nombre, String correo, String contrasena) async {
     QuerySnapshot existingMails = await FirebaseFirestore.instance
         .collection('registros')
         .where('correo', isEqualTo: correo)
@@ -45,184 +41,170 @@ class _RegisterState extends State<Register> {
         .collection('registros')
         .where('usuario', isEqualTo: usuario)
         .get();
-    if(usuario.isEmpty || nombre.isEmpty || apellido.isEmpty || correo.isEmpty || contrasena.isEmpty){
-      final route = MaterialPageRoute(builder: (context) => const EmptyFormRegister());
+    if (usuario.isEmpty ||
+        nombre.isEmpty ||
+        correo.isEmpty ||
+        contrasena.isEmpty) {
+      final route =
+          MaterialPageRoute(builder: (context) => const EmptyFormRegister());
       Navigator.push(context, route);
-    }
-    else if(existingMails.docs.isNotEmpty){
-      final route = MaterialPageRoute(builder: (context) => const SameMailFunc());
+    } else if (existingMails.docs.isNotEmpty) {
+      final route =
+          MaterialPageRoute(builder: (context) => const SameMailFunc());
       Navigator.push(context, route);
-    }
-    else if(existingUsers.docs.isNotEmpty){
-      final route = MaterialPageRoute(builder: (context) => const SameUserFunc());
+    } else if (existingUsers.docs.isNotEmpty) {
+      final route =
+          MaterialPageRoute(builder: (context) => const SameUserFunc());
       Navigator.push(context, route);
-    }
-    else{
+    } else {
       await FirebaseFirestore.instance.collection('registros').add({
         'usuario': usuario,
-        'nombre': nombre,
-        'apellido': apellido,
+        'nombre&apellido': nombre,
         'correo': correo,
         'contrasena': contrasena
       });
-      final route = MaterialPageRoute(builder: (context) => const RegisterComplete());
+      final route =
+          MaterialPageRoute(builder: (context) => const RegisterComplete());
       Navigator.push(context, route);
     }
-}
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.red[100],
-      body: ListView(
-        padding: EdgeInsets.symmetric(
-          /*horizontal: 600.0,
-          vertical: 10.0*/
-        ),
-        children: <Widget> [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
+      body: Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               CircleAvatar(
-                radius: 60,
+                radius: 50,
                 backgroundColor: Colors.white,
                 backgroundImage: AssetImage('images/principal_background.jpg'),
               ),
-              Text(
-                'REGISTRO',
-                  style: TextStyle(
-                  fontFamily: 'Blacknorthdemo',
-                  fontSize: 50.0,
-                ),
+            ]),
+            Text(
+              'REGISTRO',
+              style: TextStyle(
+                fontFamily: 'Blacknorthdemo',
+                fontSize: 35.0,
+                  color: Colors.black
               ),
-              TextField(
-                controller: _usuario,
-                autofocus: true,
-                enableInteractiveSelection: false,
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 15
-                    ),
+            ),
+            TextField(
+              controller: _usuario,
+              autofocus: true,
+              enableInteractiveSelection: false,
+              decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                   hintText: "Registre su nombre de usuario",
+                  hintStyle: (TextStyle(
+                    color: Colors.white
+                  )),
                   labelText: "Usuario",
-                  suffixIcon: Icon(
-                    Icons.verified_user
-                  ),
+                  suffixIcon: Icon(Icons.verified_user),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0)
-                  )
-                ),
-              ),
-              Divider(
-                height: 10,
-              ),
-              TextField(
-                controller: _nombre,
-                decoration: InputDecoration(
-                  hintText: "Ingrese su nombre",
-                  labelText: "Nombre",
-                  suffixIcon: Icon(
-                    Icons.man
-                  ),
+                      borderRadius: BorderRadius.circular(30.0))),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            TextField(
+              controller: _nombre,
+              decoration: InputDecoration(
+                  hintText: "Ingrese su nombre y apellido",
+                  hintStyle: (TextStyle(
+                      color: Colors.white
+                  )),
+                  labelText: "Nombre y Apellido",
+                  suffixIcon: Icon(Icons.man),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0)
-                  )
-                ),
-              ),
-              Divider(
-                height: 10,
-              ),
-              TextField(
-                controller: _apellido,
-                decoration: InputDecoration(
-                  hintText: "Ingrese su apellido",
-                  labelText: "Apellido",
-                  suffixIcon: Icon(
-                    Icons.man
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0)
-                  )
-                )
-              ),
-              Divider(
-                height: 10,
-              ),
-              TextField(
+                      borderRadius: BorderRadius.circular(30.0))),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            TextField(
                 controller: _correo,
                 decoration: InputDecoration(
-                  hintText: "Ingrese su correo electrónico",
-                  labelText: "Correo Electrónico",
-                  suffixIcon: Icon(
-                    Icons.alternate_email
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0)
-                  )
-                )
-              ),
-              Divider(
-                height: 10,
-              ),
-              TextField(
+                    hintText: "Ingrese su correo electrónico",
+                    hintStyle: (TextStyle(
+                        color: Colors.white
+                    )),
+                    labelText: "Correo Electrónico",
+                    suffixIcon: Icon(Icons.alternate_email),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0)))),
+            SizedBox(
+              height: 8,
+            ),
+            TextField(
                 controller: _contrasena,
                 decoration: InputDecoration(
-                  hintText: "Ingrese su contraseña",
-                  labelText: "Contraseña",
-                  suffixIcon: Icon(
-                    Icons.lock
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0)
-                  )
-                ),
-                  obscureText: true
-              ),
-              Divider(
-                height: 10,
-              ),
-              SizedBox(
-                width: 120,
-                child: FloatingActionButton(
-                  hoverColor: Colors.greenAccent[200],
-                  onPressed: () async {
-                    addUsers(_usuario.text.trim(), _nombre.text.trim(), _apellido.text.trim(), _correo.text.trim(), _contrasena.text.trim());
-                  },
-                  backgroundColor: Colors.red[200],
-                  child: Text('Registrar',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 35.0,
-                      fontFamily: 'Moonchild'
-                    ),
-                  ),
-                ),
-              ),
-              Divider(
-                height: 15,
-              ),
-              SizedBox(
-                width: 120,
-                child: FloatingActionButton(
-                  hoverColor: Colors.greenAccent[200],
-                  onPressed: (){
-                    final route = MaterialPageRoute(builder: (context) => StartPageMonitoring());
-                    Navigator.push(context, route);
-                  },
-                  backgroundColor: Colors.red[200],
-                  child: Text('Volver',
-                    style: TextStyle(
+                    hintText: "Ingrese su contraseña",
+                    hintStyle: (TextStyle(
+                        color: Colors.white
+                    )),
+                    labelText: "Contraseña",
+                    suffixIcon: Icon(Icons.lock),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0))),
+                obscureText: true),
+            SizedBox(
+              height: 8,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    hoverColor: Colors.greenAccent[200],
+                    onPressed: () async {
+                      addUsers(
+                        _usuario.text.trim(),
+                        _nombre.text.trim(),
+                        _correo.text.trim(),
+                        _contrasena.text.trim(),
+                      );
+                    },
+                    backgroundColor: Colors.red[200],
+                    child: Text(
+                      'Registrar',
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 35.0,
-                        fontFamily: 'Moonchild'
+                        fontFamily: 'Moonchild',
+                      ),
                     ),
                   ),
                 ),
-              )
-            ],
-          )
-        ],
-      ),
+                SizedBox(
+                  width: 150, // Ajusta el ancho del segundo botón
+                  child: FloatingActionButton(
+                    hoverColor: Colors.greenAccent[200],
+                    onPressed: () {
+                      final route = MaterialPageRoute(
+                        builder: (context) => StartPageMonitoring(),
+                      );
+                      Navigator.push(context, route);
+                    },
+                    backgroundColor: Colors.red[200],
+                    child: Text(
+                      'Volver',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 35.0,
+                        fontFamily: 'Moonchild',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ])),
     );
   }
 }
