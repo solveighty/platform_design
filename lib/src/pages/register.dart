@@ -33,7 +33,7 @@ class _RegisterState extends State<Register> {
   }
 
   FirebaseFirestore db = FirebaseFirestore.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('register');
+
 
 
   Future addUsers(String usuario, String nombre, String apellido, String correo, String contrasena) async {
@@ -84,7 +84,7 @@ class _RegisterState extends State<Register> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 115,
+                radius: 60,
                 backgroundColor: Colors.white,
                 backgroundImage: AssetImage('images/principal_background.jpg'),
               ),

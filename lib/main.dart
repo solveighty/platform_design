@@ -98,10 +98,7 @@ class _PlatformAdaptingHomePageState extends State<PlatformAdaptingHomePage> {
 
   @override
   Widget build(context) {
-    return PlatformWidget(
-      androidBuilder: _buildAndroidHomePage,
-      iosBuilder: _buildIosHomePage,
-    );
+    return Scaffold();
   }
 }
 
@@ -166,42 +163,4 @@ class _AndroidDrawer extends StatelessWidget {
       ),
     );
   }
-}
-Widget _buildIosHomePage(BuildContext context) {
-  return CupertinoTabScaffold(
-    tabBar: CupertinoTabBar(
-      items: const [
-        BottomNavigationBarItem(
-          label: SongsTab.title,
-          icon: Icon(Icons.assistant_outlined),
-        ),
-        BottomNavigationBarItem(
-          label: NewsTab.title,
-          icon: Icon(Icons.add_a_photo_outlined)
-        ),
-        BottomNavigationBarItem(
-          label: ProfileTab.title,
-          icon: Icon(Icons.auto_awesome_mosaic_rounded),
-        ),
-      ],
-    ),
-    tabBuilder: (context, index) {
-      assert(index <= 2 && index >= 0, 'Unexpected tab index: $index');
-      return switch (index) {
-        0 => CupertinoTabView(
-          defaultTitle: SongsTab.title,
-          builder: (context) => SongsTab(key: songsTabKey),
-        ),
-        1 => CupertinoTabView(
-          defaultTitle: NewsTab.title,
-          builder: (context) => const NewsTab(),
-        ),
-        2 => CupertinoTabView(
-          defaultTitle: ProfileTab.title,
-          builder: (context) => const ProfileTab(),
-        ),
-        _ => const SizedBox.shrink(),
-      };
-    },
-  );
 }

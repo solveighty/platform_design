@@ -4,8 +4,11 @@ import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/register.dart';
 
 
+
 class StartPageMonitoring extends StatefulWidget {
-  const StartPageMonitoring({super.key});
+  StartPageMonitoring({super.key});
+
+
 
   @override
   State<StartPageMonitoring> createState() => _StartPageMonitoringState();
@@ -26,7 +29,7 @@ class _StartPageMonitoringState extends State<StartPageMonitoring> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 115,
+                radius: 60,
                 backgroundColor: Colors.white,
                 backgroundImage: AssetImage('images/principal_background.jpg'),
               ),

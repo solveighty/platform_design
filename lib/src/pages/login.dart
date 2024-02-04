@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:platform_design/main.dart';
+import 'package:platform_design/src/pages/empty_form.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../news_tab.dart';
+import '../../profile_tab.dart';
+import '../../songs_tab.dart';
 import 'login_failed.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,7 +21,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   FirebaseFirestore db = FirebaseFirestore.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('register');
   
   TextEditingController _usuarioController = TextEditingController();
   TextEditingController _correoController = TextEditingController();
@@ -55,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 115,
+                radius: 60,
                 backgroundColor: Colors.white,
                 backgroundImage: AssetImage('images/principal_background.jpg'),
               ),
@@ -133,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (loginSuccessful){
                       Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => PlatformAdaptingHomePage()));
+                          MaterialPageRoute(builder: (context) => _buildIosHomePage(context)));
                     } else {
                       final route = MaterialPageRoute(builder: (context) => LoginFailed());
                       Navigator.push(context, route);
@@ -179,4 +182,41 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-
+Widget _buildIosHomePage(BuildContext context) {
+  return CupertinoTabScaffold(
+    tabBar: CupertinoTabBar(
+      items: const [
+        BottomNavigationBarItem(
+          label: SongsTab.title,
+          icon: Icon(Icons.assistant_outlined),
+        ),
+        BottomNavigationBarItem(
+            label: NewsTab.title,
+            icon: Icon(Icons.add_a_photo_outlined)
+        ),
+        BottomNavigationBarItem(
+          label: ProfileTab.title,
+          icon: Icon(Icons.auto_awesome_mosaic_rounded),
+        ),
+      ],
+    ),
+    tabBuilder: (context, index) {
+      assert(index <= 2 && index >= 0, 'Unexpected tab index: $index');
+      return switch (index) {
+        0 => CupertinoTabView(
+          defaultTitle: SongsTab.title,
+          builder: (context) => SongsTab(key: songsTabKey),
+        ),
+        1 => CupertinoTabView(
+          defaultTitle: NewsTab.title,
+          builder: (context) => const NewsTab(),
+        ),
+        2 => CupertinoTabView(
+          defaultTitle: ProfileTab.title,
+          builder: (context) => const ProfileTab(),
+        ),
+        _ => const SizedBox.shrink(),
+      };
+    },
+  );
+}
