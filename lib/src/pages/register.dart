@@ -2,10 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:platform_design/src/pages/empty_form.dart';
+import 'package:platform_design/src/pages/invalid_email.dart';
 import 'package:platform_design/src/pages/register_complete.dart';
 import 'package:platform_design/src/pages/same_mail.dart';
 import 'package:platform_design/src/pages/same_user.dart';
 import 'package:platform_design/src/pages/startpage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:email_validator/email_validator.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -31,16 +34,8 @@ class _RegisterState extends State<Register> {
 
   FirebaseFirestore db = FirebaseFirestore.instance;
 
-  Future addUsers(
+  Future<void> addUsers(
       String usuario, String nombre, String correo, String contrasena) async {
-    QuerySnapshot existingMails = await FirebaseFirestore.instance
-        .collection('registros')
-        .where('correo', isEqualTo: correo)
-        .get();
-    QuerySnapshot existingUsers = await FirebaseFirestore.instance
-        .collection('registros')
-        .where('usuario', isEqualTo: usuario)
-        .get();
     if (usuario.isEmpty ||
         nombre.isEmpty ||
         correo.isEmpty ||
@@ -48,24 +43,44 @@ class _RegisterState extends State<Register> {
       final route =
           MaterialPageRoute(builder: (context) => const EmptyFormRegister());
       Navigator.push(context, route);
-    } else if (existingMails.docs.isNotEmpty) {
-      final route =
-          MaterialPageRoute(builder: (context) => const SameMailFunc());
-      Navigator.push(context, route);
-    } else if (existingUsers.docs.isNotEmpty) {
-      final route =
-          MaterialPageRoute(builder: (context) => const SameUserFunc());
-      Navigator.push(context, route);
-    } else {
-      await FirebaseFirestore.instance.collection('registros').add({
-        'usuario': usuario,
-        'nombre&apellido': nombre,
-        'correo': correo,
-        'contrasena': contrasena
-      });
-      final route =
-          MaterialPageRoute(builder: (context) => const RegisterComplete());
-      Navigator.push(context, route);
+      return;
+    }
+    try {
+      QuerySnapshot existingUsers = await FirebaseFirestore.instance
+          .collection('registros')
+          .where('usuario', isEqualTo: usuario)
+          .get();
+
+      if (existingUsers.docs.isNotEmpty) {
+        final route =
+            MaterialPageRoute(builder: (context) => const SameUserFunc());
+        Navigator.push(context, route);
+      } else {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: correo, password: contrasena);
+
+        if (userCredential.user != null) {
+          await userCredential.user?.sendEmailVerification();
+
+          await FirebaseFirestore.instance.collection('registros').add({
+            'usuario': usuario,
+            'nombre&apellido': nombre,
+            'correo': correo,
+            'contrasena': contrasena,
+          });
+
+          final route =
+              MaterialPageRoute(builder: (context) => const RegisterComplete());
+          Navigator.push(context, route);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        final route =
+            MaterialPageRoute(builder: (context) => const SameMailFunc());
+        Navigator.push(context, route);
+      }
     }
   }
 
@@ -87,10 +102,9 @@ class _RegisterState extends State<Register> {
             Text(
               'REGISTRO',
               style: TextStyle(
-                fontFamily: 'Blacknorthdemo',
-                fontSize: 35.0,
-                  color: Colors.black
-              ),
+                  fontFamily: 'Blacknorthdemo',
+                  fontSize: 35.0,
+                  color: Colors.black),
             ),
             TextField(
               controller: _usuario,
@@ -100,9 +114,7 @@ class _RegisterState extends State<Register> {
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                   hintText: "Registre su nombre de usuario",
-                  hintStyle: (TextStyle(
-                    color: Colors.white
-                  )),
+                  hintStyle: (TextStyle(color: Colors.white)),
                   labelText: "Usuario",
                   suffixIcon: Icon(Icons.verified_user),
                   border: OutlineInputBorder(
@@ -115,9 +127,7 @@ class _RegisterState extends State<Register> {
               controller: _nombre,
               decoration: InputDecoration(
                   hintText: "Ingrese su nombre y apellido",
-                  hintStyle: (TextStyle(
-                      color: Colors.white
-                  )),
+                  hintStyle: (TextStyle(color: Colors.white)),
                   labelText: "Nombre y Apellido",
                   suffixIcon: Icon(Icons.man),
                   border: OutlineInputBorder(
@@ -130,9 +140,7 @@ class _RegisterState extends State<Register> {
                 controller: _correo,
                 decoration: InputDecoration(
                     hintText: "Ingrese su correo electrónico",
-                    hintStyle: (TextStyle(
-                        color: Colors.white
-                    )),
+                    hintStyle: (TextStyle(color: Colors.white)),
                     labelText: "Correo Electrónico",
                     suffixIcon: Icon(Icons.alternate_email),
                     border: OutlineInputBorder(
@@ -144,9 +152,7 @@ class _RegisterState extends State<Register> {
                 controller: _contrasena,
                 decoration: InputDecoration(
                     hintText: "Ingrese su contraseña",
-                    hintStyle: (TextStyle(
-                        color: Colors.white
-                    )),
+                    hintStyle: (TextStyle(color: Colors.white)),
                     labelText: "Contraseña",
                     suffixIcon: Icon(Icons.lock),
                     border: OutlineInputBorder(
@@ -163,12 +169,24 @@ class _RegisterState extends State<Register> {
                   child: FloatingActionButton(
                     hoverColor: Colors.greenAccent[200],
                     onPressed: () async {
-                      addUsers(
-                        _usuario.text.trim(),
-                        _nombre.text.trim(),
-                        _correo.text.trim(),
-                        _contrasena.text.trim(),
-                      );
+                      if (EmailValidator.validate(_correo.text.trim())) {
+                        if (_contrasena.text.trim().length < 8) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'La contraseña debe tener 8 caracteres como mínimo')));
+                        } else {
+                          addUsers(
+                            _usuario.text.trim(),
+                            _nombre.text.trim(),
+                            _correo.text.trim(),
+                            _contrasena.text.trim(),
+                          );
+                        }
+                      } else {
+                        final route = MaterialPageRoute(
+                            builder: (context) => InvalidEmailFunc());
+                        Navigator.push(context, route);
+                      }
                     },
                     backgroundColor: Colors.red[200],
                     child: Text(
