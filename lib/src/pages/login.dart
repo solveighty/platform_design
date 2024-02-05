@@ -3,7 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:platform_design/main.dart';
 import 'package:platform_design/src/pages/empty_form.dart';
+import 'package:platform_design/src/pages/empty_form_login.dart';
 import 'package:platform_design/src/pages/startpage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:email_validator/email_validator.dart';
 
 import '../../news_tab.dart';
 import '../../profile_tab.dart';
@@ -55,6 +58,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseFirestore db = FirebaseFirestore.instance;
 
   TextEditingController _usuarioController = TextEditingController();
@@ -138,8 +142,21 @@ class _LoginPageState extends State<LoginPage> {
                     String correo = _correoController.text;
                     String contrasena = _contrasenaController.text;
 
+                    // Verificar si al menos un campo está vacío
+                    if (usuario.isEmpty ||
+                        correo.isEmpty ||
+                        contrasena.isEmpty) {
+                      // Mostrar mensaje de error o redirigir a la página de fallo de inicio de sesión
+                      final route = MaterialPageRoute(
+                          builder: (context) => EmptyFormLogin());
+                      Navigator.push(context, route);
+                      return; // Salir del método para evitar ejecutar el resto del código
+                    }
+
+                    // Todos los campos están llenos, proceder con la verificación de inicio de sesión
                     bool loginSuccessful =
                         await verifyLogin(usuario, correo, contrasena);
+
                     if (loginSuccessful) {
                       Navigator.pushReplacement(
                         context,
@@ -147,10 +164,12 @@ class _LoginPageState extends State<LoginPage> {
                             builder: (context) => _buildIosHomePage(context)),
                       );
                     } else {
+                      // Mostrar mensaje de error o redirigir a la página de fallo de inicio de sesión
                       final route = MaterialPageRoute(
                           builder: (context) => LoginFailed());
                       Navigator.push(context, route);
                     }
+
                     setState(() {});
                   },
                   backgroundColor: Colors.red[200],
@@ -196,16 +215,26 @@ class _LoginPageState extends State<LoginPage> {
       String usuario, String correo, String contrasena) async {
     CollectionReference collectionReference = db.collection('registros');
 
-    //consulta
+    // Consulta
     QuerySnapshot queryPeople = await collectionReference.get();
-    //iterar
+
+    // Iterar
     for (QueryDocumentSnapshot document in queryPeople.docs) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
       if (data['usuario'] == usuario &&
           data['correo'] == correo &&
           data['contrasena'] == contrasena) {
-        return true; // Se encontró una coincidencia
+        // Usuario encontrado en la base de datos
+        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: correo,
+          password: contrasena,
+        );
+
+        if (userCredential.user != null) {
+          // Autenticación exitosa
+          return true;
+        }
       }
     }
     return false;
