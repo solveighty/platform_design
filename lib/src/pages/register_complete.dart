@@ -53,6 +53,13 @@ class _RegisterCompleteState extends State<RegisterComplete>
                 fontSize: 30.0,
                 color: Colors.black),
           ),
+          Text(
+            'VERIFICA TU CORREO',
+            style: TextStyle(
+                fontFamily: 'Blacknorthdemo',
+                fontSize: 30.0,
+                color: Colors.black),
+          )
         ],
       )),
     );

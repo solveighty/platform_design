@@ -65,8 +65,6 @@ class _RegisterState extends State<Register> {
 
           String actionCodeSettings = 'aactionCodeSettings';
 
-          await 
-
           await FirebaseFirestore.instance.collection('registros').add({
             'usuario': usuario,
             'nombre&apellido': nombre,
