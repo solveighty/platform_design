@@ -23,6 +23,7 @@ dependencies:
   bubble: ^1.2.1
   firebase_auth: ^4.17.3
   email_validator: ^2.1.17
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

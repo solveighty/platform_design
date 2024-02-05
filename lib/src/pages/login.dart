@@ -6,7 +6,7 @@ import 'package:platform_design/src/pages/empty_form.dart';
 import 'package:platform_design/src/pages/empty_form_login.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:email_validator/email_validator.dart';
+
 
 import '../../news_tab.dart';
 import '../../profile_tab.dart';
