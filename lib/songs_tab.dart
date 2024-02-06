@@ -12,7 +12,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'utils.dart';
 import 'package:http/http.dart' as http;
@@ -180,17 +179,20 @@ class _SongsTabState extends State<SongsTab> {
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title: Text("Cerrar Sesión"),
-                          content: Text("¿Estás seguro de que deseas cerrar sesión?"),
+                          content: Text(
+                              "¿Estás seguro de que deseas cerrar sesión?"),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop(false); // No cerrar sesión
+                                Navigator.of(context)
+                                    .pop(false); // No cerrar sesión
                               },
                               child: Text("Cancelar"),
                             ),
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop(true); // Confirmar cerrar sesión
+                                Navigator.of(context)
+                                    .pop(true); // Confirmar cerrar sesión
                               },
                               child: Text("Cerrar Sesión"),
                             ),
@@ -204,7 +206,9 @@ class _SongsTabState extends State<SongsTab> {
                         await FirebaseAuth.instance.signOut();
                         // Redirigir a la pantalla de inicio de sesión después de cerrar sesión
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => StartPageMonitoring()),
+                          CupertinoPageRoute(
+                            builder: (context) => StartPageMonitoring(),
+                          ),
                               (Route<dynamic> route) => false,
                         );
                       } catch (e) {
@@ -214,6 +218,7 @@ class _SongsTabState extends State<SongsTab> {
                     }
                   },
                 ),
+                CircleAvatar()
               ],
             ),
           ),

@@ -24,6 +24,7 @@ dependencies:
   firebase_auth: ^4.17.3
   email_validator: ^2.1.17
   shared_preferences: ^2.2.2
+  permission_handler: ^11.2.0
 
 dev_dependencies:
   flutter_test:
