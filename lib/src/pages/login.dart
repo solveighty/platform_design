@@ -17,7 +17,6 @@ Widget _buildIosHomePage(BuildContext context) {
     future: checkAuthenticationStatus(),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        // Puedes mostrar un indicador de carga mientras se verifica la autenticación
         return CircularProgressIndicator();
       } else {
         if (snapshot.data == true) {

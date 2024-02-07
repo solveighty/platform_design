@@ -4,9 +4,28 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'details.dart';
 
 import 'settings_tab.dart';
 import 'widgets.dart';
+
+List<ImageDetails> _images = [
+  ImageDetails(
+      imagePath: 'images/img1.jpeg',
+      nombrePrenda: "Staryuuki",
+      colorPrenda: ["rojo", "amarillo", "blanco"],
+      descripcionPrenda: "una prenda demasiado cómoda"),
+  ImageDetails(
+      imagePath: 'images/ai_avatar.png',
+      nombrePrenda: "CrystalMolly",
+      colorPrenda: ["rojo", "amarillo", "blanco"],
+      descripcionPrenda: "una prenda demasiado cómoda"),
+  ImageDetails(
+      imagePath: 'images/principal_background.jpg',
+      nombrePrenda: "RuneBee",
+      colorPrenda: ["rojo", "amarillo", "blanco"],
+      descripcionPrenda: "una prenda demasiado cómoda")
+];
 
 class ProfileTab extends StatelessWidget {
   static const title = 'Galeria';
@@ -16,48 +35,52 @@ class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
 
   Widget _buildBody(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
+    return Scaffold(
+      body: SafeArea(
         child: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(8),
-              child: Center(
-                child: Text(
-                  '😼',
-                  style: TextStyle(
-                    fontSize: 80,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-              ),
-            ),
-            const PreferenceCard(
-              header: 'MY INTENSITY PREFERENCE',
-              content: '🔥',
-              preferenceChoices: [
-                'Super heavy',
-                'Dial it to 11',
-                "Head bangin'",
-                '1000W',
-                'My neighbor hates me',
-              ],
-            ),
-            const PreferenceCard(
-              header: 'CURRENT MOOD',
-              content: '🤘🏾🚀',
-              preferenceChoices: [
-                'Over the moon',
-                'Basking in sunlight',
-                'Hello fellow Martians',
-                'Into the darkness',
-              ],
-            ),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
             Expanded(
-              child: Container(),
-            ),
-            const LogOutButton(),
+                child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 40,
+                vertical: 30,
+              ),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30))),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10),
+                itemBuilder: (context, index) {
+                  return RawMaterialButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DetailsImg(
+                                  imagePath: _images[index].imagePath,
+                                  nombrePrenda: _images[index].nombrePrenda,
+                                  colorPrenda: _images[index].colorPrenda,
+                                  descripcionPrenda:
+                                      _images[index].descripcionPrenda)));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          image: DecorationImage(
+                              image: AssetImage(_images[index].imagePath),
+                              fit: BoxFit.cover)),
+                    ),
+                  );
+                },
+                itemCount: _images.length,
+              ),
+            ))
           ],
         ),
       ),
@@ -257,4 +280,17 @@ class LogOutButton extends StatelessWidget {
       iosBuilder: _buildIos,
     );
   }
+}
+
+class ImageDetails {
+  late final String imagePath;
+  late final String nombrePrenda;
+  late final List<String> colorPrenda;
+  late final String descripcionPrenda;
+
+  ImageDetails(
+      {required this.imagePath,
+      required this.nombrePrenda,
+      required this.colorPrenda,
+      required this.descripcionPrenda});
 }

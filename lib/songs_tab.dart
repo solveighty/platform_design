@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:bubble/bubble.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -112,6 +114,9 @@ class _SongsTabState extends State<SongsTab> {
 
   late List<MaterialColor> colors;
   late List<String> songNames;
+  late User? _avatar;
+  late String _profileImageUrl;
+
 
   @override
   void initState() {
@@ -169,6 +174,10 @@ class _SongsTabState extends State<SongsTab> {
           child: Drawer(
             child: ListView(
               children: <Widget>[
+                CircleAvatar(
+                  radius: 40,
+                ),
+                Text(''),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
                   title: Text("Cerrar Sesión"),
@@ -218,7 +227,6 @@ class _SongsTabState extends State<SongsTab> {
                     }
                   },
                 ),
-                CircleAvatar()
               ],
             ),
           ),
