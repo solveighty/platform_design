@@ -56,9 +56,36 @@ class _NewsTabState extends State<NewsTab> {
       await _initializeControllerFuture;
       final XFile picture = await _controller.takePicture();
       print('Imagen guardada en: ${picture.path}');
+      await _showSavePhotoDialog(context);
     } catch (e) {
       print('Error al tomar la foto: $e');
     }
+  }
+
+  Future<void> _showSavePhotoDialog(BuildContext context) async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              '¿Quieres guardar la foto?',
+            ),
+            actions: <Widget>[
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Si')),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Tomar otra foto"),
+              )
+            ],
+          );
+        });
   }
 
   @override
