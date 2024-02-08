@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:platform_design/main.dart';
 import 'package:platform_design/src/pages/empty_form_login.dart';
 import 'package:platform_design/src/pages/register.dart';
@@ -11,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../news_tab.dart';
 import '../../profile_tab.dart';
 import '../../songs_tab.dart';
+import 'google_auth.dart';
 import 'login_failed.dart';
 
 Widget _buildIosHomePage(BuildContext context) {
@@ -155,6 +157,51 @@ class _LoginPageState extends State<LoginPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
+              ),
+            ),
+            Padding(padding: EdgeInsets.all(5)),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  final user = await UserController.loginWithGoogle();
+                  if (user != null && mounted) {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => _buildIosHomePage(context)));
+                  }
+                } on FirebaseAuthException catch (error) {
+                  print(error.message);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                        error.message ?? "Something went wrong",
+                      )));
+                } catch (error) {
+                  print(error);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('No has seleccionado ninguna cuenta',
+                      )));
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                backgroundColor: Colors.red[300],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SvgPicture.asset(
+                    'images/google-icon.svg',
+                    height: 24.0,
+                    width: 24.0,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'INGRESO CON GOOGLE',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
               ),
             ),
             SizedBox(

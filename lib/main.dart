@@ -26,49 +26,6 @@ void main() async {
 
 class MyAdaptingApp extends StatelessWidget {
   const MyAdaptingApp({super.key});
-
-  Widget _buildIosHomePage(BuildContext context) {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(
-        items: const [
-          BottomNavigationBarItem(
-            label: SongsTab.title,
-            icon: Icon(Icons.assistant_outlined),
-          ),
-          BottomNavigationBarItem(
-            label: NewsTab.title,
-            icon: Icon(Icons.add_a_photo_outlined),
-          ),
-          BottomNavigationBarItem(
-            label: ProfileTab.title,
-            icon: Icon(Icons.auto_awesome_mosaic_rounded),
-          ),
-        ],
-      ),
-      tabBuilder: (context, index) {
-        assert(index <= 2 && index >= 0, 'Unexpected tab index: $index');
-        switch (index) {
-          case 0:
-            return CupertinoTabView(
-              defaultTitle: SongsTab.title,
-              builder: (context) => SongsTab(key: songsTabKey),
-            );
-          case 1:
-            return CupertinoTabView(
-              defaultTitle: NewsTab.title,
-              builder: (context) => const NewsTab(),
-            );
-          case 2:
-            return CupertinoTabView(
-              defaultTitle: ProfileTab.title,
-              builder: (context) => const ProfileTab(),
-            );
-          default:
-            return SizedBox.shrink();
-        }
-      },
-    );
-  }
   @override
   Widget build(context) {
     // Either Material or Cupertino widgets work in either Material or Cupertino
@@ -91,9 +48,7 @@ class MyAdaptingApp extends StatelessWidget {
           child: Material(child: child),
         );
       },
-        //home: StartPageMonitoring(),
-      //home: _buildIosHomePage(context),
-      home: Register(),
+        home: StartPageMonitoring(),
     );
   }
 }

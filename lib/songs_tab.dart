@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +10,9 @@ import 'dart:math';
 import 'package:bubble/bubble.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'utils.dart';
 import 'package:http/http.dart' as http;
@@ -117,7 +116,6 @@ class _SongsTabState extends State<SongsTab> {
   late User? _avatar;
   late String _profileImageUrl;
 
-
   @override
   void initState() {
     _setData();
@@ -176,14 +174,25 @@ class _SongsTabState extends State<SongsTab> {
               children: <Widget>[
                 CircleAvatar(
                   radius: 40,
+                  child: ClipOval(
+                    child: Image.network(
+                      UserController.user?.photoURL ?? '',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                Text(''),
+                Padding(padding: EdgeInsets.all(5)),
+                Center(
+                  child: Text(UserController.user?.email ?? ''),
+                ),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
                   title: Text("Cerrar Sesión"),
                   subtitle: Text("Salir de la cuenta"),
                   onTap: () async {
-                    bool confirmLogout = await showDialog(
+                    await showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
@@ -199,9 +208,14 @@ class _SongsTabState extends State<SongsTab> {
                               child: Text("Cancelar"),
                             ),
                             TextButton(
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .pop(true); // Confirmar cerrar sesión
+                              onPressed: () async {
+                                await UserController.signOut();
+                                if (mounted) {
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              StartPageMonitoring()));
+                                }
                               },
                               child: Text("Cerrar Sesión"),
                             ),
@@ -209,22 +223,6 @@ class _SongsTabState extends State<SongsTab> {
                         );
                       },
                     );
-
-                    if (confirmLogout != null && confirmLogout) {
-                      try {
-                        await FirebaseAuth.instance.signOut();
-                        // Redirigir a la pantalla de inicio de sesión después de cerrar sesión
-                        Navigator.of(context).pushAndRemoveUntil(
-                          CupertinoPageRoute(
-                            builder: (context) => StartPageMonitoring(),
-                          ),
-                              (Route<dynamic> route) => false,
-                        );
-                      } catch (e) {
-                        print("Error al cerrar sesión: $e");
-                        // Manejar el error (puedes mostrar un mensaje de error al usuario)
-                      }
-                    }
                   },
                 ),
               ],

@@ -2,7 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:platform_design/main.dart';
 import 'package:platform_design/src/pages/empty_form.dart';
+import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/src/pages/invalid_email.dart';
 import 'package:platform_design/src/pages/register_complete.dart';
 import 'package:platform_design/src/pages/same_mail.dart';
@@ -10,6 +13,11 @@ import 'package:platform_design/src/pages/same_user.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
+
+import '../../news_tab.dart';
+import '../../profile_tab.dart';
+import '../../songs_tab.dart';
+
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -33,17 +41,6 @@ class _RegisterState extends State<Register> {
     super.dispose();
   }
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? _user;
-  FirebaseFirestore db = FirebaseFirestore.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    _auth.authStateChanges().listen((event) {
-      _user = event;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,45 +152,9 @@ class _RegisterState extends State<Register> {
               ),
             ),
             SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                _handleGoogleSignIn();
-                print(_user!.photoURL);
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 15.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                backgroundColor: Colors.red[300],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SvgPicture.asset(
-                    'images/google-icon.svg',
-                    height: 24.0,
-                    width: 24.0,
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    'INGRESO CON GOOGLE',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
     );
-  }
-  void _handleGoogleSignIn(){
-    try{
-      GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
-      _auth.signInWithProvider(googleAuthProvider);
-    }catch(e){
-      print(e);
-    }
   }
 }
