@@ -93,7 +93,7 @@ class MyAdaptingApp extends StatelessWidget {
       },
         //home: StartPageMonitoring(),
       //home: _buildIosHomePage(context),
-      home: EmptyFormLogin(),
+      home: Register(),
     );
   }
 }

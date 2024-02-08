@@ -33,7 +33,17 @@ class _RegisterState extends State<Register> {
     super.dispose();
   }
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _user;
   FirebaseFirestore db = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _auth.authStateChanges().listen((event) {
+      _user = event;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +156,10 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () async {},
+              onPressed: () {
+                _handleGoogleSignIn();
+                print(_user!.photoURL);
+              },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15.0),
                 shape: RoundedRectangleBorder(
@@ -174,5 +187,13 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
+  }
+  void _handleGoogleSignIn(){
+    try{
+      GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
+      _auth.signInWithProvider(googleAuthProvider);
+    }catch(e){
+      print(e);
+    }
   }
 }
