@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:platform_design/main.dart';
 import 'package:platform_design/src/pages/empty_form_login.dart';
+import 'package:platform_design/src/pages/register.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,61 +14,46 @@ import '../../songs_tab.dart';
 import 'login_failed.dart';
 
 Widget _buildIosHomePage(BuildContext context) {
-  return FutureBuilder<bool>(
-    future: checkAuthenticationStatus(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return CircularProgressIndicator();
-      } else {
-        if (snapshot.data == true) {
-          return CupertinoTabScaffold(
-            tabBar: CupertinoTabBar(
-              items: const [
-                BottomNavigationBarItem(
-                  label: SongsTab.title,
-                  icon: Icon(Icons.assistant_outlined),
-                ),
-                BottomNavigationBarItem(
-                    label: NewsTab.title,
-                    icon: Icon(Icons.add_a_photo_outlined)),
-                BottomNavigationBarItem(
-                  label: ProfileTab.title,
-                  icon: Icon(Icons.auto_awesome_mosaic_rounded),
-                ),
-              ],
-            ),
-            tabBuilder: (context, index) {
-              assert(index <= 2 && index >= 0, 'Unexpected tab index: $index');
-              return switch (index) {
-                0 => CupertinoTabView(
-                    defaultTitle: SongsTab.title,
-                    builder: (context) => SongsTab(key: songsTabKey),
-                  ),
-                1 => CupertinoTabView(
-                    defaultTitle: NewsTab.title,
-                    builder: (context) => const NewsTab(),
-                  ),
-                2 => CupertinoTabView(
-                    defaultTitle: ProfileTab.title,
-                    builder: (context) => const ProfileTab(),
-                  ),
-                _ => const SizedBox.shrink(),
-              };
-            },
+  return CupertinoTabScaffold(
+    tabBar: CupertinoTabBar(
+      items: const [
+        BottomNavigationBarItem(
+          label: SongsTab.title,
+          icon: Icon(Icons.assistant_outlined),
+        ),
+        BottomNavigationBarItem(
+          label: NewsTab.title,
+          icon: Icon(Icons.add_a_photo_outlined),
+        ),
+        BottomNavigationBarItem(
+          label: ProfileTab.title,
+          icon: Icon(Icons.auto_awesome_mosaic_rounded),
+        ),
+      ],
+    ),
+    tabBuilder: (context, index) {
+      assert(index <= 2 && index >= 0, 'Unexpected tab index: $index');
+      switch (index) {
+        case 0:
+          return CupertinoTabView(
+            defaultTitle: SongsTab.title,
+            builder: (context) => SongsTab(key: songsTabKey),
           );
-        } else {
-          return LoginPage();
-        }
+        case 1:
+          return CupertinoTabView(
+            defaultTitle: NewsTab.title,
+            builder: (context) => const NewsTab(),
+          );
+        case 2:
+          return CupertinoTabView(
+            defaultTitle: ProfileTab.title,
+            builder: (context) => const ProfileTab(),
+          );
+        default:
+          return SizedBox.shrink();
       }
     },
   );
-}
-
-Future<bool> checkAuthenticationStatus() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
-
-  return isAuthenticated;
 }
 
 class LoginPage extends StatefulWidget {
@@ -81,181 +67,116 @@ class _LoginPageState extends State<LoginPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseFirestore db = FirebaseFirestore.instance;
 
-  TextEditingController _usuarioController = TextEditingController();
   TextEditingController _correoController = TextEditingController();
   TextEditingController _contrasenaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red[100],
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.white,
-              backgroundImage: AssetImage('images/principal_background.jpg'),
+      backgroundColor: Colors.grey[700],
+      appBar: AppBar(
+        title: Text('Ingreso'),
+        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () {
+              final route = MaterialPageRoute(
+                  builder: (context) => StartPageMonitoring());
+              Navigator.push(context, route);
+            },
+            icon: Icon(Icons.navigate_before_rounded),
+          )
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.black,
+                  width: 2,
+                ),
+              ),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage('images/principal_background.jpg'),
+              ),
             ),
-          ]),
-          Text(
-            'INGRESO',
-            style: TextStyle(
+            SizedBox(height: 20.0),
+            Text(
+              'INGRESA TUS DATOS',
+              textAlign: TextAlign.center,
+              style: TextStyle(
                 fontFamily: 'Blacknorthdemo',
-                fontSize: 35.0,
-                color: Colors.black),
-          ),
-          TextField(
-            controller: _usuarioController,
-            autofocus: true,
-            enableInteractiveSelection: false,
-            decoration: InputDecoration(
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                hintText: "Ingrese su nombre de usuario",
-                hintStyle: (TextStyle(color: Colors.white)),
-                labelText: "Usuario",
-                suffixIcon: Icon(Icons.verified_user),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0))),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
+                fontSize: 25.0,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 20.0),
+            TextField(
               controller: _correoController,
               decoration: InputDecoration(
-                  hintText: "Ingrese su correo electrónico",
-                  hintStyle: (TextStyle(color: Colors.white)),
-                  labelText: "Correo Electrónico",
-                  suffixIcon: Icon(Icons.alternate_email),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0)))),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
-            controller: _contrasenaController,
-            decoration: InputDecoration(
-                hintText: "Ingrese su contraseña",
-                hintStyle: (TextStyle(color: Colors.white)),
-                labelText: "Contraseña",
-                suffixIcon: Icon(Icons.lock),
+                labelText: 'Correo Electrónico',
+                prefixIcon: Icon(Icons.alternate_email),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0))),
-            obscureText: true,
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: 150, // Ajusta el ancho del primer botón
-                child: FloatingActionButton(
-                  hoverColor: Colors.greenAccent[200],
-                  onPressed: () async {
-                    String usuario = _usuarioController.text;
-                    String correo = _correoController.text;
-                    String contrasena = _contrasenaController.text;
-
-                    // Verificar si al menos un campo está vacío
-                    if (usuario.isEmpty ||
-                        correo.isEmpty ||
-                        contrasena.isEmpty) {
-                      // Mostrar mensaje de error o redirigir a la página de fallo de inicio de sesión
-                      final route = MaterialPageRoute(
-                          builder: (context) => EmptyFormLogin());
-                      Navigator.push(context, route);
-                      return; // Salir del método para evitar ejecutar el resto del código
-                    }
-
-                    // Todos los campos están llenos, proceder con la verificación de inicio de sesión
-                    bool loginSuccessful =
-                        await verifyLogin(usuario, correo, contrasena);
-
-                    if (loginSuccessful) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => _buildIosHomePage(context)),
-                      );
-                    } else {
-                      // Mostrar mensaje de error o redirigir a la página de fallo de inicio de sesión
-                      final route = MaterialPageRoute(
-                          builder: (context) => LoginFailed());
-                      Navigator.push(context, route);
-                    }
-
-                    setState(() {});
-                  },
-                  backgroundColor: Colors.red[200],
-                  child: Text(
-                    'Ingresar',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 35.0,
-                      fontFamily: 'Moonchild',
-                    ),
-                  ),
+                  borderRadius: BorderRadius.circular(30.0),
                 ),
               ),
-              SizedBox(
-                width: 150, // Ajusta el ancho del segundo botón
-                child: FloatingActionButton(
-                  hoverColor: Colors.greenAccent[200],
-                  onPressed: () {
-                    final route = MaterialPageRoute(
-                      builder: (context) => StartPageMonitoring(),
-                    );
-                    Navigator.push(context, route);
-                  },
-                  backgroundColor: Colors.red[200],
-                  child: Text(
-                    'Volver',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 35.0,
-                      fontFamily: 'Moonchild',
-                    ),
-                  ),
+            ),
+            SizedBox(height: 10.0),
+            TextField(
+              controller: _contrasenaController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Contraseña',
+                prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
                 ),
               ),
-            ],
-          ),
-        ],
-      )),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () async {},
+              child: Text(
+                'INGRESAR',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Register()),
+                );
+              },
+              child: Text(
+                '¿No tienes una cuenta? Regístrate',
+                style: TextStyle(
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
-  }
-
-  Future<bool> verifyLogin(
-      String usuario, String correo, String contrasena) async {
-    CollectionReference collectionReference = db.collection('registros');
-
-    // Consulta
-    QuerySnapshot queryPeople = await collectionReference.get();
-
-    // Iterar
-    for (QueryDocumentSnapshot document in queryPeople.docs) {
-      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-
-      if (data['usuario'] == usuario &&
-          data['correo'] == correo &&
-          data['contrasena'] == contrasena) {
-        // Usuario encontrado en la base de datos
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: correo,
-          password: contrasena,
-        );
-
-        if (userCredential.user != null) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 }

@@ -14,7 +14,7 @@ class _StartPageMonitoringState extends State<StartPageMonitoring> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red[100],
+      backgroundColor: Colors.grey[700],
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -24,58 +24,59 @@ class _StartPageMonitoringState extends State<StartPageMonitoring> {
               children: [
                 CircleAvatar(
                   radius: 115,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Colors.grey[700],
                   backgroundImage:
                       AssetImage('images/principal_background.jpg'),
                 ),
                 Text(
                   'ASISTENTE FASHION',
                   style: TextStyle(
-                    fontFamily: 'Blacknorthdemo',
-                    fontSize: 45.0,
+                      fontFamily: 'Blacknorthdemo',
+                      fontSize: 45.0,
                       color: Colors.black),
                 ),
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    hoverColor: Colors.greenAccent[200],
-                    onPressed: () {
-                      final route =
-                          MaterialPageRoute(builder: (context) => LoginPage());
-                      Navigator.push(context, route);
-                    },
-                    backgroundColor: Colors.red[200],
-                    child: Text(
-                      'Ingresar',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 35.0,
-                          fontFamily: 'Moonchild'),
+                CircleAvatar(
+                  radius: 115,
+                  backgroundColor: Colors.grey[700],
+                  backgroundImage:
+                  AssetImage('images/principal_background2.jpeg'),
+                ),
+                SizedBox(height: 100.0),
+                ElevatedButton(
+                  onPressed: () async {
+                    final route = MaterialPageRoute(
+                        builder: (context) => LoginPage());
+                    Navigator.push(context, route);
+                  },
+                  child: Text(
+                    'INGRESAR',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 150),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    hoverColor: Colors.greenAccent[200],
-                    onPressed: () {
-                      final route =
-                          MaterialPageRoute(builder: (context) => Register());
-                      Navigator.push(context, route);
-                    },
-                    backgroundColor: Colors.red[200],
-                    child: Text(
-                      'Registrarse',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 35.0,
-                          fontFamily: 'Moonchild'),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    final route = MaterialPageRoute(
+                        builder: (context) => Register());
+                    Navigator.push(context, route);
+                  },
+                  child: Text(
+                    'REGISTRAR',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 150),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
-                )
+                ),
               ],
             )
           ],
