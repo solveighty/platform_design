@@ -210,6 +210,7 @@ class _SongsTabState extends State<SongsTab> {
                             TextButton(
                               onPressed: () async {
                                 await UserController.signOut();
+                                FirebaseAuth.instance.signOut();
                                 if (mounted) {
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(

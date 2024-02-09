@@ -66,8 +66,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseFirestore db = FirebaseFirestore.instance;
+  final FirebaseAuthService _auth = FirebaseAuthService();
 
   TextEditingController _correoController = TextEditingController();
   TextEditingController _contrasenaController = TextEditingController();
@@ -147,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: () async {},
+              onPressed: _signIn,
               child: Text(
                 'INGRESAR',
                 style: TextStyle(color: Colors.white),
@@ -225,5 +224,17 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void _signIn() async{
+    String email = _correoController.text;
+    String password = _contrasenaController.text;
+
+    User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+    if (user != null){
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => _buildIosHomePage(context)));
+    }
   }
 }

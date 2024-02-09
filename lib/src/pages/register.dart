@@ -7,6 +7,7 @@ import 'package:platform_design/main.dart';
 import 'package:platform_design/src/pages/empty_form.dart';
 import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/src/pages/invalid_email.dart';
+import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/register_complete.dart';
 import 'package:platform_design/src/pages/same_mail.dart';
 import 'package:platform_design/src/pages/same_user.dart';
@@ -14,9 +15,6 @@ import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
 
-import '../../news_tab.dart';
-import '../../profile_tab.dart';
-import '../../songs_tab.dart';
 
 
 class Register extends StatefulWidget {
@@ -27,17 +25,18 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final _usuario = TextEditingController();
-  final _nombre = TextEditingController();
-  final _correo = TextEditingController();
-  final _contrasena = TextEditingController();
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  final _usuarioController = TextEditingController();
+  final _nombre_apellidoController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _contrasenaController = TextEditingController();
 
   @override
   void dispose() {
-    _usuario.dispose();
-    _nombre.dispose();
-    _contrasena.dispose();
-    _contrasena.dispose();
+    _usuarioController.dispose();
+    _nombre_apellidoController.dispose();
+    _emailController.dispose();
+    _contrasenaController.dispose();
     super.dispose();
   }
 
@@ -94,7 +93,7 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 20.0),
             TextField(
-              controller: _usuario,
+              controller: _usuarioController,
               decoration: InputDecoration(
                 labelText: 'Usuario',
                 prefixIcon: Icon(Icons.verified_user),
@@ -105,7 +104,7 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 10.0),
             TextField(
-              controller: _nombre,
+              controller: _nombre_apellidoController,
               decoration: InputDecoration(
                 labelText: 'Nombre y Apellido',
                 prefixIcon: Icon(Icons.person),
@@ -116,7 +115,7 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 10.0),
             TextField(
-              controller: _correo,
+              controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Correo Electrónico',
                 prefixIcon: Icon(Icons.alternate_email),
@@ -127,7 +126,7 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 10.0),
             TextField(
-              controller: _contrasena,
+              controller: _contrasenaController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Contraseña',
@@ -139,7 +138,7 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: () async {},
+              onPressed: _signUp,
               child: Text(
                 'REGISTRAR',
                 style: TextStyle(color: Colors.white),
@@ -156,5 +155,19 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
+  }
+
+  void _signUp() async{
+    String username = _usuarioController.text;
+    String nombre = _nombre_apellidoController.text;
+    String email = _emailController.text;
+    String password = _contrasenaController.text;
+
+    User? user = await _auth.signUpWithEmailAndPasssword(email, password);
+
+    if (user != null){
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => RegisterComplete()));
+    }
   }
 }

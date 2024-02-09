@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
+
+import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +51,12 @@ class MyAdaptingApp extends StatelessWidget {
           child: Material(child: child),
         );
       },
-        home: StartPageMonitoring(),
+        home: Scaffold(
+          body: WillPopScope(
+            child: LoginPage(),
+            onWillPop: () {exit(0);},
+          ),
+        ),
     );
   }
 }
