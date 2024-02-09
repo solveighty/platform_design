@@ -1,21 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:platform_design/main.dart';
-import 'package:platform_design/src/pages/empty_form.dart';
 import 'package:platform_design/src/pages/google_auth.dart';
-import 'package:platform_design/src/pages/invalid_email.dart';
-import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/register_complete.dart';
-import 'package:platform_design/src/pages/same_mail.dart';
-import 'package:platform_design/src/pages/same_user.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
-
-
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -26,6 +16,7 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final FirebaseAuthService _auth = FirebaseAuthService();
+  final FirebaseFirestore bd = FirebaseFirestore.instance;
   final _usuarioController = TextEditingController();
   final _nombre_apellidoController = TextEditingController();
   final _emailController = TextEditingController();
@@ -39,7 +30,6 @@ class _RegisterState extends State<Register> {
     _contrasenaController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -157,17 +147,78 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  void _signUp() async{
+  void _signUp() async {
     String username = _usuarioController.text;
     String nombre = _nombre_apellidoController.text;
     String email = _emailController.text;
     String password = _contrasenaController.text;
 
-    User? user = await _auth.signUpWithEmailAndPasssword(email, password);
+    if (username.isEmpty || nombre.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Llene los datos.'),
+        ),
+      );
+      return;
+    }
 
-    if (user != null){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => RegisterComplete()));
+    if (username.length < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Su nombre de usuario debe tener almenos 5 caracteres.'),
+        ),
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('La contraseña debe tener al menos 8 caracteres.'),
+        ),
+      );
+      return;
+    }
+
+    if (!EmailValidator.validate(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Ingrese un correo válido.'),
+        ),
+      );
+      return;
+    }
+
+    try{
+      User? user = await _auth.signUpWithEmailAndPasssword(email, password);
+
+      if (user != null) {
+        await _guardarDatosUsuario(user.uid, username, nombre, email);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => RegisterComplete()));
+      }
+    }catch(e){
+      if (e is FirebaseAuthException && e.code == 'email-already-in-use'){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Este correo ya ha sido registrado anteriormente'),
+          ),
+        );
+      }
+      return;
+    }
+  }
+
+  Future<void> _guardarDatosUsuario(
+      String userId, String username, String nombre, String email) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('registros')
+          .doc(userId)
+          .set({'usuario': username, 'nombre': nombre, 'email': email});
+      print('Datos de usuario guardados correctamente en Firestore.');
+    } catch (e) {
+      print('Error al guardar los datos del usuario: $e');
     }
   }
 }

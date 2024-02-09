@@ -3,17 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:platform_design/main.dart';
-import 'package:platform_design/src/pages/empty_form_login.dart';
 import 'package:platform_design/src/pages/register.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../news_tab.dart';
 import '../../profile_tab.dart';
 import '../../songs_tab.dart';
 import 'google_auth.dart';
-import 'login_failed.dart';
 
 Widget _buildIosHomePage(BuildContext context) {
   return CupertinoTabScaffold(
@@ -230,11 +227,32 @@ class _LoginPageState extends State<LoginPage> {
     String email = _correoController.text;
     String password = _contrasenaController.text;
 
-    User? user = await _auth.signInWithEmailAndPassword(email, password);
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Llene los datos.'),
+        ),
+      );
+      return;
+    }
 
-    if (user != null){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => _buildIosHomePage(context)));
+    try{
+      User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+      if (user != null){
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => _buildIosHomePage(context)));
+      }
+    }catch(e){
+      if (e is FirebaseAuthException && e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('El correo electrónico no está registrado.'),
+          ),
+        );
+      } else {
+        print(e);
+      }
     }
   }
 }

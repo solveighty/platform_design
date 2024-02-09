@@ -4,11 +4,9 @@
 
 import 'dart:io';
 
-import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:platform_design/src/pages/empty_form_login.dart';
 import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/register.dart';
 import 'package:platform_design/src/pages/startpage.dart';
@@ -53,7 +51,7 @@ class MyAdaptingApp extends StatelessWidget {
       },
         home: Scaffold(
           body: WillPopScope(
-            child: LoginPage(),
+            child: Register(),
             onWillPop: () {exit(0);},
           ),
         ),

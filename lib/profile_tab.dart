@@ -34,6 +34,26 @@ class ProfileTab extends StatelessWidget {
 
   const ProfileTab({super.key});
 
+  Future<void> _showSuggestionDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Sugerencia'),
+          content: Text('Aquí se guardarán todas las prendas que posees, junto con información detallada.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildBody(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -95,7 +115,18 @@ class ProfileTab extends StatelessWidget {
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(title),
+        centerTitle: true,
+        title: Row(
+          children: [
+            Text('Galería'),
+            IconButton(
+              onPressed: () {
+                _showSuggestionDialog(context);
+              },
+              icon: Icon(Icons.info),
+            ),
+          ],
+        ),
       ),
       body: _buildBody(context),
     );

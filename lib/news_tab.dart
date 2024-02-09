@@ -88,15 +88,44 @@ class _NewsTabState extends State<NewsTab> {
         });
   }
 
+  Future<void> _showSuggestionDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Sugerencia'),
+          content: Text('Al momento de tomar la foto, asegúrate de estar en un lugar con buena iluminación.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Cámara'),
+        title: Row(
+          children: [
+            Text('Cámara'),
+            IconButton(
+              onPressed: () {
+                _showSuggestionDialog(context);
+              },
+              icon: Icon(Icons.info),
+            ),
+          ],
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: kToolbarHeight),
+      body: Center(
         child: FutureBuilder<void>(
           future: _initializeControllerFuture,
           builder: (context, snapshot) {

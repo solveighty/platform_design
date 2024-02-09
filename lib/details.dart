@@ -107,11 +107,9 @@ class DetailsImg extends StatelessWidget {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: Text(
-                                'Volver',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Blacknorthdemo'),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: Colors.black,
                               ),
                             ),
                           ),
