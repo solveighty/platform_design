@@ -78,4 +78,5 @@ class DefaultAccentColor {
   static Color? accentPressed = Colors.purple[400];
   static Color defaultBackground = Colors.white;
   static Color defaultBackgroundDark = Colors.black54;
+  static Color textColor = Colors.black87;
 }

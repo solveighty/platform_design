@@ -170,14 +170,18 @@ class _SongsTabState extends State<SongsTab> {
   // ===========================================================================
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
+      backgroundColor: DefaultAccentColor.defaultBackground,
         appBar: AppBar(
-          title: const Text(
+          backgroundColor: DefaultAccentColor.defaultBackground,
+          title: Text(
             SongsTab.title,
-            style: TextStyle(fontSize: 25),
+            style: TextStyle(fontSize: 25, color: DefaultAccentColor.textColor),
           ),
         ),
         drawer: Drawer(
+          backgroundColor: DefaultAccentColor.defaultBackground,
           child: Drawer(
+            backgroundColor: DefaultAccentColor.defaultBackground,
             child: ListView(
               children: <Widget>[
                 CircleAvatar(
@@ -193,20 +197,21 @@ class _SongsTabState extends State<SongsTab> {
                 ),
                 Padding(padding: EdgeInsets.all(5)),
                 Center(
-                  child: Text(UserController.user?.email ?? ''),
+                  child: Text(UserController.user?.email ?? '', style: TextStyle(color: DefaultAccentColor.textColor),),
                 ),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
-                  title: Text("Cerrar Sesión"),
-                  subtitle: Text("Salir de la cuenta"),
+                  title: Text("Cerrar Sesión", style: TextStyle(color: DefaultAccentColor.textColor),),
+                  subtitle: Text("Salir de la cuenta", style: TextStyle(color: DefaultAccentColor.textColor),),
                   onTap: () async {
                     await showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text("Cerrar Sesión"),
+                          backgroundColor: DefaultAccentColor.defaultBackground,
+                          title: Text("Cerrar Sesión", style: TextStyle(color: DefaultAccentColor.textColor)),
                           content: Text(
-                              "¿Estás seguro de que deseas cerrar sesión?"),
+                              "¿Estás seguro de que deseas cerrar sesión?", style: TextStyle(color: DefaultAccentColor.textColor),),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
@@ -214,7 +219,7 @@ class _SongsTabState extends State<SongsTab> {
                                 Navigator.of(context)
                                     .pop(false); // No cerrar sesión
                               },
-                              child: Text("Cancelar"),
+                              child: Text("Cancelar", style: TextStyle(color: DefaultAccentColor.accentPressed),),
                             ),
                             TextButton(
                               onPressed: () async {
@@ -228,7 +233,7 @@ class _SongsTabState extends State<SongsTab> {
                                       (Route<dynamic> route) => false);
                                 }
                               },
-                              child: Text("Cerrar Sesión"),
+                              child: Text("Cerrar Sesión", style: TextStyle(color: DefaultAccentColor.accentPressed),),
                             ),
                           ],
                         );

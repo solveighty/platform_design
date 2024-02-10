@@ -4,6 +4,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:platform_design/utils.dart';
 import 'details.dart';
 
 import 'settings_tab.dart';
@@ -39,9 +40,15 @@ class ProfileTab extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Sugerencia'),
+          backgroundColor: DefaultAccentColor.defaultBackground,
+          title: Text(
+            'Sugerencia',
+            style: TextStyle(color: DefaultAccentColor.textColor),
+          ),
           content: Text(
-              'Aquí se guardarán todas las prendas que posees, junto con información detallada.'),
+            'Aquí se guardarán todas las prendas que posees, junto con información detallada.',
+            style: TextStyle(color: DefaultAccentColor.textColor),
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -57,6 +64,7 @@ class ProfileTab extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     return Scaffold(
+      backgroundColor: DefaultSelectionStyle.defaultColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -69,7 +77,7 @@ class ProfileTab extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  color: Colors.black45,
+                  color: DefaultAccentColor.defaultBackground,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(10),
                       topRight: Radius.circular(10))),
@@ -120,16 +128,21 @@ class ProfileTab extends StatelessWidget {
 
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
+      backgroundColor: DefaultAccentColor.defaultBackground,
       appBar: AppBar(
+        backgroundColor: DefaultAccentColor.defaultBackground,
         centerTitle: true,
         title: Row(
           children: [
-            Text('Galería'),
+            Text(
+              'Galería',
+              style: TextStyle(color: DefaultAccentColor.textColor),
+            ),
             IconButton(
               onPressed: () {
                 _showSuggestionDialog(context);
               },
-              icon: Icon(Icons.info),
+              icon: Icon(Icons.info, color: DefaultAccentColor.textColor),
             ),
           ],
         ),

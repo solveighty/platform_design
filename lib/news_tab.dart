@@ -152,16 +152,18 @@ class _NewsTabState extends State<NewsTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DefaultAccentColor.defaultBackground,
       appBar: AppBar(
+        backgroundColor: DefaultAccentColor.defaultBackground,
         centerTitle: true,
         title: Row(
           children: [
-            Text('Añadir'),
+            Text('Añadir', style: TextStyle(color: DefaultAccentColor.textColor),),
             IconButton(
               onPressed: () {
                 _showSuggestionDialog(context);
               },
-              icon: Icon(Icons.info),
+              icon: Icon(Icons.info, color: DefaultAccentColor.textColor,),
             ),
           ],
         ),

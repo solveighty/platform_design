@@ -19,6 +19,7 @@ import 'google_auth.dart';
 Widget _buildIosHomePage(BuildContext context) {
   return CupertinoTabScaffold(
     tabBar: CupertinoTabBar(
+      backgroundColor: DefaultAccentColor.defaultBackground,
       activeColor: DefaultAccentColor.accentPressed,
       items: [
         BottomNavigationBarItem(
@@ -168,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontFamily: 'Blacknorthdemo',
                 fontSize: 25.0,
-                color: Colors.black,
+                color: DefaultAccentColor.textColor,
               ),
             ),
             SizedBox(height: 20.0),
