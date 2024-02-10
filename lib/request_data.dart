@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io' as io;
@@ -21,9 +22,13 @@ class SendToRest {
     var response = await http.post(url, headers: headers, body: body);
     if (response.statusCode ==  200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
+      Fluttertoast.showToast(msg: jsonResponse['message']);
       print(jsonResponse['data']);
       return jsonResponse['data'];
     } else {
+      print(response.body);
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      Fluttertoast.showToast(msg: jsonResponse['message']);
       throw Exception('Failed to load data. Status code: ${response.statusCode}.');
     }
   }

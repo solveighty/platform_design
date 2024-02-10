@@ -75,7 +75,7 @@ String capitalizePair(WordPair pair) {
 
 class DefaultAccentColor {
   static Color accentNormal = Colors.blue;
-  static Color? accentPressed = Colors.blue[400];
+  static Color? accentPressed = Colors.purple[400];
   static Color defaultBackground = Colors.white;
   static Color defaultBackgroundDark = Colors.black54;
 }

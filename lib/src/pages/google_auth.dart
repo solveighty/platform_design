@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class UserController{
-  static User? user = FirebaseAuth.instance.currentUser;
+  static User? user;
+
+  static void setUser(User? newUser) {
+    user = newUser;
+  }
+  static ValueNotifier<User?> userNotifier = ValueNotifier<User?>(null);
+
+
 
   static Future<User?> loginWithGoogle() async {
     final googleAccount = await GoogleSignIn().signIn();
@@ -20,11 +27,18 @@ class UserController{
     );
     return userCredential.user;
   }
+  static void initListeners() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      userNotifier.value = user;
+    });
+  }
 
   static Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
   }
+
+
 }
 
 class FirebaseAuthService{

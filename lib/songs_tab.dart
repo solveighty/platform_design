@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +44,9 @@ class _SongsTabState extends State<SongsTab> {
   final _user = const types.User(id: '82091008-a484-4a89-ae75-a22bf8d6f3ac');
   final _user2 = const types.User(id: 'i192039-a484-4a89-ae75-a22bf8d6f3ac');
   bool _isEnabled = true;
+
+  late StreamSubscription<User?> _authStateChangesSubscription;
+
 
   void _toggleEnabled() {
     sendSugerir();
@@ -120,6 +125,9 @@ class _SongsTabState extends State<SongsTab> {
   void initState() {
     _setData();
     super.initState();
+    _authStateChangesSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      UserController.setUser(user);
+    });
   }
 
   void _setData() {
@@ -202,6 +210,7 @@ class _SongsTabState extends State<SongsTab> {
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
+
                                 Navigator.of(context)
                                     .pop(false); // No cerrar sesión
                               },
@@ -210,7 +219,7 @@ class _SongsTabState extends State<SongsTab> {
                             TextButton(
                               onPressed: () async {
                                 await UserController.signOut();
-                                FirebaseAuth.instance.signOut();
+                                await FirebaseAuth.instance.signOut();
                                 if (mounted) {
                                   Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(
@@ -350,7 +359,7 @@ class _SongsTabState extends State<SongsTab> {
         color: _user.id != message.author.id ||
                 message.type == types.MessageType.image
             ? Colors.white30
-            : const Color(0xff6f61e8),
+            : DefaultAccentColor.accentPressed,
         margin: nextMessageInGroup
             ? const BubbleEdges.symmetric(horizontal: 6)
             : null,

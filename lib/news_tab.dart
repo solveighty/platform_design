@@ -13,6 +13,7 @@ import 'package:camera/camera.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_design/request_data.dart';
+import 'package:platform_design/utils.dart';
 
 class NewsTab extends StatefulWidget {
   static const title = 'Añadir';
@@ -69,6 +70,7 @@ class _NewsTabState extends State<NewsTab> {
   }
 
   Future<void> _showSavePhotoDialog(BuildContext context, XFile picture) async {
+    ImageProvider? img;
     List<int> bytes = SendToRest.readBytes(picture.path);
 
     return showDialog<void>(
@@ -79,22 +81,49 @@ class _NewsTabState extends State<NewsTab> {
             title: Text(
               '¿Quieres guardar la foto?',
             ),
-            content: Container(
-              child: FutureBuilder(
-                future: SendToRest.sendToRest(bytes),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator(); // Show a loading indicator while waiting
-                  } else if (snapshot.hasError) {
-                    return Text('Error loading image');
-                  } else {
-                    Uint8List bytesDecoded = base64Decode("${snapshot.data!}");
-                    ImageProvider imageProvider = MemoryImage(bytesDecoded);
-                    return Image(image: imageProvider); // Display the loaded image
-                  }
-                },
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FutureBuilder(
+                  future: SendToRest.sendToRest(bytes),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text('Error loading image');
+                    } else {
+                      Uint8List bytesDecoded =
+                          base64Decode("${snapshot.data!}");
+                      ImageProvider imageProvider = MemoryImage(bytesDecoded);
+                      img = imageProvider;
+                      return Image(image: imageProvider);
+                    }
+                  },
+                ),
+              ],
             ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FilledButton(
+                    style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
+                    onPressed: () {
+
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Aceptar'),
+                  ),
+                  FilledButton(
+                    style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Tomar otra foto"),
+                  ),
+                ],
+              ),
+            ],
           );
         });
   }
@@ -165,6 +194,7 @@ class _NewsTabState extends State<NewsTab> {
               child: Icon(
                 Icons.camera_alt_rounded,
                 size: 50,
+                color: DefaultAccentColor.accentPressed,
               ),
               backgroundColor: Colors.transparent,
               elevation: 0,

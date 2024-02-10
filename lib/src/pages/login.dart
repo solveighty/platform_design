@@ -19,7 +19,8 @@ import 'google_auth.dart';
 Widget _buildIosHomePage(BuildContext context) {
   return CupertinoTabScaffold(
     tabBar: CupertinoTabBar(
-      items: const [
+      activeColor: DefaultAccentColor.accentPressed,
+      items: [
         BottomNavigationBarItem(
           label: SongsTab.title,
           icon: Icon(Icons.assistant_outlined),
@@ -67,10 +68,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  User? user;
+
   final FirebaseAuthService _auth = FirebaseAuthService();
 
   TextEditingController _correoController = TextEditingController();
   TextEditingController _contrasenaController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((User? userUp) {
+      user = userUp;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +173,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 20.0),
             TextField(
+              keyboardType: TextInputType.emailAddress,
               controller: _correoController,
               decoration: InputDecoration(
                 labelText: 'Correo Electrónico',
@@ -203,7 +214,11 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  final user = await UserController.loginWithGoogle();
+                  var userG = await UserController.loginWithGoogle();
+                  setState(() {
+                    user = userG;
+                  });
+
                   if (user != null && mounted) {
                     Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
