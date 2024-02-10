@@ -72,3 +72,10 @@ String capitalize(String word) {
 String capitalizePair(WordPair pair) {
   return '${capitalize(pair.first)} ${capitalize(pair.second)}';
 }
+
+class DefaultAccentColor {
+  static Color accentNormal = Colors.blue;
+  static Color? accentPressed = Colors.blue[400];
+  static Color? defaultBackground = Colors.white;
+  static Color? defaultBackgroundDark = Colors.black54;
+}

@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:is_first_run/is_first_run.dart';
 import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/register.dart';
+import 'package:platform_design/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class StartPageMonitoring extends StatefulWidget {
   StartPageMonitoring({super.key});
+
 
   @override
   State<StartPageMonitoring> createState() => _StartPageMonitoringState();
@@ -14,7 +19,7 @@ class _StartPageMonitoringState extends State<StartPageMonitoring> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[700],
+      backgroundColor: DefaultAccentColor.defaultBackground,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -24,7 +29,7 @@ class _StartPageMonitoringState extends State<StartPageMonitoring> {
               children: [
                 CircleAvatar(
                   radius: 115,
-                  backgroundColor: Colors.grey[700],
+                  backgroundColor: DefaultAccentColor.defaultBackground,
                   backgroundImage:
                       AssetImage('images/principal_background.jpg'),
                 ),
@@ -54,6 +59,7 @@ class _StartPageMonitoringState extends State<StartPageMonitoring> {
                   ),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 150),
+                    backgroundColor: DefaultAccentColor.accentPressed,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -72,6 +78,7 @@ class _StartPageMonitoringState extends State<StartPageMonitoring> {
                   ),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 150),
+                    backgroundColor: DefaultAccentColor.accentPressed,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),

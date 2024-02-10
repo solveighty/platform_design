@@ -10,28 +10,34 @@ import 'package:flutter/material.dart';
 import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/register.dart';
 import 'package:platform_design/src/pages/startpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'news_tab.dart';
 import 'profile_tab.dart';
 import 'settings_tab.dart';
 import 'songs_tab.dart';
-import 'widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyAdaptingApp());
+  var prefs = await SharedPreferences.getInstance();
+  var boolKey = 'isFirstTime';
+  var isFirstTime = prefs.getBool(boolKey) ?? true;
+  runApp(MaterialApp( home: isFirstTime ? CarrousellScreen(prefs, boolKey) : LoginPage()));
 }
 
 class MyAdaptingApp extends StatelessWidget {
+
   const MyAdaptingApp({super.key});
+
   @override
   Widget build(context) {
     // Either Material or Cupertino widgets work in either Material or Cupertino
     // Apps.
     return MaterialApp(
+
       debugShowCheckedModeBanner: false,
       title: 'Armario Inteligente',
       theme: ThemeData(
@@ -49,12 +55,7 @@ class MyAdaptingApp extends StatelessWidget {
           child: Material(child: child),
         );
       },
-        home: Scaffold(
-          body: WillPopScope(
-            child: Register(),
-            onWillPop: () {exit(0);},
-          ),
-        ),
+        home: StartPageMonitoring(),
     );
   }
 }
@@ -168,6 +169,18 @@ class _AndroidDrawer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+class CarrousellScreen extends StatelessWidget {
+  final SharedPreferences prefs;
+  final String boolKey;
+  CarrousellScreen(this.prefs, this.boolKey);
+
+  Widget build(BuildContext context) {
+    prefs.setBool(boolKey, false); // You might want to save this on a callback.
+    return Scaffold(
+      body: Center(child: Text("Dany"),),
     );
   }
 }

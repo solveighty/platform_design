@@ -212,10 +212,10 @@ class _SongsTabState extends State<SongsTab> {
                                 await UserController.signOut();
                                 FirebaseAuth.instance.signOut();
                                 if (mounted) {
-                                  Navigator.of(context).pushReplacement(
+                                  Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              StartPageMonitoring()));
+                                              StartPageMonitoring()), (Route<dynamic> route) => false);
                                 }
                               },
                               child: Text("Cerrar Sesión"),
@@ -249,6 +249,7 @@ class _SongsTabState extends State<SongsTab> {
                   SizedBox(
                       width: 180,
                       child: FilledButton(
+                        style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
                           child: const Text('Sugerir',
                               style: TextStyle(
                                 fontSize: 17,
@@ -267,6 +268,7 @@ class _SongsTabState extends State<SongsTab> {
                   SizedBox(
                     width: 180,
                     child: FilledButton(
+                      style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
                         child: const Text('Combinación',
                             style: TextStyle(
                               fontSize: 17,

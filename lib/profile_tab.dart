@@ -40,7 +40,8 @@ class ProfileTab extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Sugerencia'),
-          content: Text('Aquí se guardarán todas las prendas que posees, junto con información detallada.'),
+          content: Text(
+              'Aquí se guardarán todas las prendas que posees, junto con información detallada.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -63,19 +64,21 @@ class ProfileTab extends StatelessWidget {
             Expanded(
                 child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: 40,
-                vertical: 30,
+                horizontal: 10,
+                vertical: 10,
               ),
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  color: Colors.black45,
                   borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30))),
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10))),
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10),
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 5,
+                    mainAxisExtent: 190),
                 itemBuilder: (context, index) {
                   return RawMaterialButton(
                     onPressed: () {
@@ -91,8 +94,11 @@ class ProfileTab extends StatelessWidget {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(10),
                           image: DecorationImage(
+                              isAntiAlias: true,
+                              filterQuality: FilterQuality.low,
                               image: AssetImage(_images[index].imagePath),
                               fit: BoxFit.cover)),
                     ),

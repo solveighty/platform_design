@@ -8,7 +8,7 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class NewsTab extends StatefulWidget {
-  static const title = 'Cámara';
+  static const title = 'Añadir';
   static const androidIcon = Icon(Icons.camera_alt);
   static const iosIcon = Icon(CupertinoIcons.photo_camera);
 
@@ -115,7 +115,7 @@ class _NewsTabState extends State<NewsTab> {
         centerTitle: true,
         title: Row(
           children: [
-            Text('Cámara'),
+            Text('Añadir'),
             IconButton(
               onPressed: () {
                 _showSuggestionDialog(context);

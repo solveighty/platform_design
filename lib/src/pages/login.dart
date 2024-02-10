@@ -1,11 +1,15 @@
+import 'package:aura_box/aura_box.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:platform_design/main.dart';
 import 'package:platform_design/src/pages/register.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:platform_design/utils.dart';
 
 import '../../news_tab.dart';
 import '../../profile_tab.dart';
@@ -71,27 +75,66 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[700],
+      backgroundColor: DefaultAccentColor.defaultBackground,
       appBar: AppBar(
-        title: Text('Ingreso'),
-        backgroundColor: Colors.black,
+        title: AuraBox(
+          decoration: const BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.all(
+              Radius.circular(0),
+            ),
+          ),
+          spots: [
+            AuraSpot(
+              color: Colors.purple.shade300,
+              radius: 500,
+              alignment: const Alignment(0, 0.9),
+              blurRadius: 50,
+            ),
+            AuraSpot(
+              color: Colors.deepPurple.shade100,
+              radius: 400,
+              alignment: const Alignment(-1.2, 1.2),
+              blurRadius: 50,
+            ),
+            AuraSpot(
+              color: Colors.indigo.shade700,
+              radius: 400,
+              alignment: const Alignment(-0.5, -1.2),
+              blurRadius: 50,
+            ),
+            AuraSpot(
+              color: Colors.purpleAccent.shade700,
+              radius: 300,
+              alignment: const Alignment(1.2, -1.2),
+              blurRadius: 100,
+            ),
+          ],
+          child: Container(
+            height: 50,
+            child: Center(
+              child: Text(
+                "INGRESO",
+                textAlign: TextAlign.left,
+                style: GoogleFonts.abel(
+                  letterSpacing: 0.2,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                    color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+        backgroundColor: DefaultAccentColor.defaultBackground,
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            onPressed: () {
-              final route = MaterialPageRoute(
-                  builder: (context) => StartPageMonitoring());
-              Navigator.push(context, route);
-            },
-            icon: Icon(Icons.navigate_before_rounded),
-          )
-        ],
+        titleSpacing: 0,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Padding(padding: EdgeInsets.all(20)),
             Container(
               width: 100,
               height: 100,
@@ -150,6 +193,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15.0),
+                backgroundColor: DefaultAccentColor.accentPressed,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -161,20 +205,23 @@ class _LoginPageState extends State<LoginPage> {
                 try {
                   final user = await UserController.loginWithGoogle();
                   if (user != null && mounted) {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => _buildIosHomePage(context)));
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => _buildIosHomePage(context)),
+                        (Route<dynamic> route) => false);
                   }
                 } on FirebaseAuthException catch (error) {
                   print(error.message);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(
-                        error.message ?? "Something went wrong",
-                      )));
+                    error.message ?? "Something went wrong",
+                  )));
                 } catch (error) {
                   print(error);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('No has seleccionado ninguna cuenta',
-                      )));
+                      content: Text(
+                    'No has seleccionado ninguna cuenta',
+                  )));
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -223,7 +270,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _signIn() async{
+  void _signIn() async {
     String email = _correoController.text;
     String password = _contrasenaController.text;
 
@@ -236,23 +283,21 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    try{
-      User? user = await _auth.signInWithEmailAndPassword(email, password);
+    try {
+      User? user =
+          await _auth.signInWithEmailAndPassword(email, password, context);
 
-      if (user != null){
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => _buildIosHomePage(context)));
+      if (user != null) {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => _buildIosHomePage(context)),
+            (Route<dynamic> route) => false);
       }
-    }catch(e){
-      if (e is FirebaseAuthException && e.code == 'user-not-found') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('El correo electrónico no está registrado.'),
-          ),
-        );
-      } else {
-        print(e);
-      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('El correo electrónico no está registrado.'),
+        ),
+      );
     }
   }
 }

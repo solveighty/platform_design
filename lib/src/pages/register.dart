@@ -1,11 +1,14 @@
+import 'package:aura_box/aura_box.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/src/pages/register_complete.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:platform_design/utils.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -34,21 +37,59 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[700],
+      backgroundColor: DefaultAccentColor.defaultBackground,
       appBar: AppBar(
-        title: Text('Registro'),
-        backgroundColor: Colors.black,
+        title: AuraBox(
+          decoration: const BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.all(
+              Radius.circular(0),
+            ),
+          ),
+          spots: [
+            AuraSpot(
+              color: Colors.purple.shade300,
+              radius: 500,
+              alignment: const Alignment(0, 0.9),
+              blurRadius: 50,
+            ),
+            AuraSpot(
+              color: Colors.deepPurple.shade100,
+              radius: 400,
+              alignment: const Alignment(-1.2, 1.2),
+              blurRadius: 50,
+            ),
+            AuraSpot(
+              color: Colors.indigo.shade700,
+              radius: 400,
+              alignment: const Alignment(-0.5, -1.2),
+              blurRadius: 50,
+            ),
+            AuraSpot(
+              color: Colors.purpleAccent.shade700,
+              radius: 300,
+              alignment: const Alignment(1.2, -1.2),
+              blurRadius: 100,
+            ),
+          ],
+          child: Container(
+            height: 50,
+            child: Center(
+              child: Text(
+                "REGISTRO",
+                textAlign: TextAlign.left,
+                style: GoogleFonts.abel(
+                    letterSpacing: 0.2,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                    color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+        backgroundColor: DefaultAccentColor.defaultBackground,
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            onPressed: () {
-              final route = MaterialPageRoute(
-                  builder: (context) => StartPageMonitoring());
-              Navigator.push(context, route);
-            },
-            icon: Icon(Icons.navigate_before_rounded),
-          )
-        ],
+        titleSpacing: 0,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20.0),
@@ -135,6 +176,7 @@ class _RegisterState extends State<Register> {
               ),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15.0),
+                backgroundColor: DefaultAccentColor.accentPressed,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -190,7 +232,7 @@ class _RegisterState extends State<Register> {
     }
 
     try{
-      User? user = await _auth.signUpWithEmailAndPasssword(email, password);
+      User? user = await _auth.signUpWithEmailAndPasssword(email, password, context);
 
       if (user != null) {
         await _guardarDatosUsuario(user.uid, username, nombre, email);
