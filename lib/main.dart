@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:platform_design/src/carrousel_widget.dart';
 import 'package:platform_design/src/pages/login.dart';
 import 'package:platform_design/src/pages/register.dart';
 import 'package:platform_design/src/pages/startpage.dart';
@@ -25,6 +26,7 @@ void main() async {
   var prefs = await SharedPreferences.getInstance();
   var boolKey = 'isFirstTime';
   var isFirstTime = prefs.getBool(boolKey) ?? true;
+  //runApp(MaterialApp( home: CarrousellScreen(prefs, boolKey) ));
   runApp(MaterialApp( home: isFirstTime ? CarrousellScreen(prefs, boolKey) : LoginPage()));
 }
 
@@ -179,8 +181,6 @@ class CarrousellScreen extends StatelessWidget {
 
   Widget build(BuildContext context) {
     prefs.setBool(boolKey, false); // You might want to save this on a callback.
-    return Scaffold(
-      body: Center(child: Text("Dany"),),
-    );
+    return Carrousel();
   }
 }

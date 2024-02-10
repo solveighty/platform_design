@@ -35,6 +35,8 @@ dependencies:
   aura_box: ^1.0.2
   is_first_run: ^1.0.0
   flutter_carousel_widget: ^2.2.0
+  flutter_animate: ^4.5.0
+  page_transition: ^2.1.0
 
 
 dev_dependencies:

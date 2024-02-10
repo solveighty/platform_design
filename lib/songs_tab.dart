@@ -215,7 +215,8 @@ class _SongsTabState extends State<SongsTab> {
                                   Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              StartPageMonitoring()), (Route<dynamic> route) => false);
+                                              StartPageMonitoring()),
+                                      (Route<dynamic> route) => false);
                                 }
                               },
                               child: Text("Cerrar Sesión"),
@@ -234,7 +235,9 @@ class _SongsTabState extends State<SongsTab> {
           bubbleBuilder: _bubbleBuilder,
           showUserAvatars: true,
           showUserNames: true,
-          theme: const DefaultChatTheme(backgroundColor: Colors.black54),
+          theme: DefaultChatTheme(
+              backgroundColor: DefaultAccentColor.defaultBackground,
+              inputBackgroundColor: DefaultAccentColor.defaultBackground, inputTextColor: DefaultAccentColor.defaultBackgroundDark),
           messages: _messages,
           onSendPressed: _handleSendPressed,
           user: _user,
@@ -249,7 +252,9 @@ class _SongsTabState extends State<SongsTab> {
                   SizedBox(
                       width: 180,
                       child: FilledButton(
-                        style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
+                          style: FilledButton.styleFrom(
+                              backgroundColor:
+                                  DefaultAccentColor.accentPressed),
                           child: const Text('Sugerir',
                               style: TextStyle(
                                 fontSize: 17,
@@ -268,7 +273,8 @@ class _SongsTabState extends State<SongsTab> {
                   SizedBox(
                     width: 180,
                     child: FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
+                        style: FilledButton.styleFrom(
+                            backgroundColor: DefaultAccentColor.accentPressed),
                         child: const Text('Combinación',
                             style: TextStyle(
                               fontSize: 17,
@@ -343,7 +349,7 @@ class _SongsTabState extends State<SongsTab> {
         child: child,
         color: _user.id != message.author.id ||
                 message.type == types.MessageType.image
-            ? const Color(0xfff5f5f7)
+            ? Colors.white30
             : const Color(0xff6f61e8),
         margin: nextMessageInGroup
             ? const BubbleEdges.symmetric(horizontal: 6)
