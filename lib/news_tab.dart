@@ -2,10 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:platform_design/request_data.dart';
 
 class NewsTab extends StatefulWidget {
   static const title = 'Añadir';
@@ -55,14 +62,15 @@ class _NewsTabState extends State<NewsTab> {
     try {
       await _initializeControllerFuture;
       final XFile picture = await _controller.takePicture();
-      print('Imagen guardada en: ${picture.path}');
-      await _showSavePhotoDialog(context);
+      await _showSavePhotoDialog(context, picture);
     } catch (e) {
       print('Error al tomar la foto: $e');
     }
   }
 
-  Future<void> _showSavePhotoDialog(BuildContext context) async {
+  Future<void> _showSavePhotoDialog(BuildContext context, XFile picture) async {
+    List<int> bytes = SendToRest.readBytes(picture.path);
+
     return showDialog<void>(
         context: context,
         barrierDismissible: false,
@@ -71,19 +79,22 @@ class _NewsTabState extends State<NewsTab> {
             title: Text(
               '¿Quieres guardar la foto?',
             ),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Si')),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
+            content: Container(
+              child: FutureBuilder(
+                future: SendToRest.sendToRest(bytes),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // Show a loading indicator while waiting
+                  } else if (snapshot.hasError) {
+                    return Text('Error loading image');
+                  } else {
+                    Uint8List bytesDecoded = base64Decode("${snapshot.data!}");
+                    ImageProvider imageProvider = MemoryImage(bytesDecoded);
+                    return Image(image: imageProvider); // Display the loaded image
+                  }
                 },
-                child: Text("Tomar otra foto"),
-              )
-            ],
+              ),
+            ),
           );
         });
   }
@@ -94,7 +105,8 @@ class _NewsTabState extends State<NewsTab> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Sugerencia'),
-          content: Text('Al momento de tomar la foto, asegúrate de estar en un lugar con buena iluminación.'),
+          content: Text(
+              'Al momento de tomar la foto, asegúrate de estar en un lugar con buena iluminación.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
