@@ -47,7 +47,6 @@ class _SongsTabState extends State<SongsTab> {
 
   late StreamSubscription<User?> _authStateChangesSubscription;
 
-
   void _toggleEnabled() {
     sendSugerir();
     setState(() {
@@ -125,7 +124,8 @@ class _SongsTabState extends State<SongsTab> {
   void initState() {
     _setData();
     super.initState();
-    _authStateChangesSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    _authStateChangesSubscription =
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
       UserController.setUser(user);
     });
   }
@@ -170,7 +170,7 @@ class _SongsTabState extends State<SongsTab> {
   // ===========================================================================
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
-      backgroundColor: DefaultAccentColor.defaultBackground,
+        backgroundColor: DefaultAccentColor.defaultBackground,
         appBar: AppBar(
           backgroundColor: DefaultAccentColor.defaultBackground,
           title: Text(
@@ -188,7 +188,8 @@ class _SongsTabState extends State<SongsTab> {
                   radius: 40,
                   child: ClipOval(
                     child: Image.network(
-                      UserController.user?.photoURL ?? '',
+                      UserController.user?.photoURL ??
+                          "https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg",
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
@@ -197,29 +198,46 @@ class _SongsTabState extends State<SongsTab> {
                 ),
                 Padding(padding: EdgeInsets.all(5)),
                 Center(
-                  child: Text(UserController.user?.email ?? '', style: TextStyle(color: DefaultAccentColor.textColor),),
+                  child: Text(
+                    UserController.user?.email ?? '',
+                    style: TextStyle(color: DefaultAccentColor.textColor),
+                  ),
                 ),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
-                  title: Text("Cerrar Sesión", style: TextStyle(color: DefaultAccentColor.textColor),),
-                  subtitle: Text("Salir de la cuenta", style: TextStyle(color: DefaultAccentColor.textColor),),
+                  title: Text(
+                    "Cerrar Sesión",
+                    style: TextStyle(color: DefaultAccentColor.textColor),
+                  ),
+                  subtitle: Text(
+                    "Salir de la cuenta",
+                    style: TextStyle(color: DefaultAccentColor.textColor),
+                  ),
                   onTap: () async {
                     await showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
                           backgroundColor: DefaultAccentColor.defaultBackground,
-                          title: Text("Cerrar Sesión", style: TextStyle(color: DefaultAccentColor.textColor)),
+                          title: Text("Cerrar Sesión",
+                              style: TextStyle(
+                                  color: DefaultAccentColor.textColor)),
                           content: Text(
-                              "¿Estás seguro de que deseas cerrar sesión?", style: TextStyle(color: DefaultAccentColor.textColor),),
+                            "¿Estás seguro de que deseas cerrar sesión?",
+                            style:
+                                TextStyle(color: DefaultAccentColor.textColor),
+                          ),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
-
                                 Navigator.of(context)
                                     .pop(false); // No cerrar sesión
                               },
-                              child: Text("Cancelar", style: TextStyle(color: DefaultAccentColor.accentPressed),),
+                              child: Text(
+                                "Cancelar",
+                                style: TextStyle(
+                                    color: DefaultAccentColor.accentPressed),
+                              ),
                             ),
                             TextButton(
                               onPressed: () async {
@@ -233,7 +251,11 @@ class _SongsTabState extends State<SongsTab> {
                                       (Route<dynamic> route) => false);
                                 }
                               },
-                              child: Text("Cerrar Sesión", style: TextStyle(color: DefaultAccentColor.accentPressed),),
+                              child: Text(
+                                "Cerrar Sesión",
+                                style: TextStyle(
+                                    color: DefaultAccentColor.accentPressed),
+                              ),
                             ),
                           ],
                         );
@@ -251,7 +273,8 @@ class _SongsTabState extends State<SongsTab> {
           showUserNames: true,
           theme: DefaultChatTheme(
               backgroundColor: DefaultAccentColor.defaultBackground,
-              inputBackgroundColor: DefaultAccentColor.defaultBackground, inputTextColor: DefaultAccentColor.defaultBackgroundDark),
+              inputBackgroundColor: DefaultAccentColor.defaultBackground,
+              inputTextColor: DefaultAccentColor.defaultBackgroundDark),
           messages: _messages,
           onSendPressed: _handleSendPressed,
           user: _user,

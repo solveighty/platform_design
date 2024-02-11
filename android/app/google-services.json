@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "192618487675",
+    "project_id": "armariointeligente-5ea80",
+    "storage_bucket": "armariointeligente-5ea80.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:192618487675:android:71a6e3583cd3a1c7f427de",
+        "android_client_info": {
+          "package_name": "dev.flutter.platform_design"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "192618487675-r3mlv2pfhmgshg6es6u945v31o1mugoa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCssutSWkFxapiRj7CQ62VKVBcADYG0uT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "192618487675-r3mlv2pfhmgshg6es6u945v31o1mugoa.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "192618487675-ko5vc2ierkaero4l5a136n0u72a597gd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "dev.flutter.platformDesign"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
