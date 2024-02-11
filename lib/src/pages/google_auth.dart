@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class UserController{
+  static bool isSignedInWithGoogle = false;
+
   static User? user;
+  static String? userId;
 
   static void setUser(User? newUser) {
     user = newUser;
@@ -25,6 +28,8 @@ class UserController{
     final userCredential = await FirebaseAuth.instance.signInWithCredential(
       credential,
     );
+    isSignedInWithGoogle = true;
+    userId = userCredential.user?.uid;
     return userCredential.user;
   }
   static void initListeners() {
@@ -42,6 +47,7 @@ class UserController{
 }
 
 class FirebaseAuthService{
+  static String? userId;
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<User?> signUpWithEmailAndPasssword(String email, String password, context) async {
@@ -60,6 +66,7 @@ class FirebaseAuthService{
   Future<User?> signInWithEmailAndPassword(String email, String password, context) async{
     try{
       UserCredential credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      userId = credential.user?.uid;
       return credential.user;
     } on FirebaseAuthException catch(e){
       ScaffoldMessenger.of(context).showSnackBar(

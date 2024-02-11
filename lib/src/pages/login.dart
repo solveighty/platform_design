@@ -75,6 +75,7 @@ class _LoginPageState extends State<LoginPage> {
 
   TextEditingController _correoController = TextEditingController();
   TextEditingController _contrasenaController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -128,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                 "INGRESO",
                 textAlign: TextAlign.left,
                 style: GoogleFonts.abel(
-                  letterSpacing: 0.2,
+                    letterSpacing: 0.2,
                     fontWeight: FontWeight.bold,
                     fontSize: 25,
                     color: Colors.white),
@@ -174,11 +175,15 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 20.0),
             TextField(
+              style: TextStyle(color: DefaultAccentColor.textColor),
               keyboardType: TextInputType.emailAddress,
               controller: _correoController,
               decoration: InputDecoration(
                 labelText: 'Correo Electrónico',
-                prefixIcon: Icon(Icons.alternate_email),
+                prefixIcon: Icon(
+                  Icons.alternate_email,
+                  color: DefaultAccentColor.textColor,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -186,11 +191,15 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 10.0),
             TextField(
+              style: TextStyle(color: DefaultAccentColor.textColor),
               controller: _contrasenaController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Contraseña',
-                prefixIcon: Icon(Icons.lock),
+                prefixIcon: Icon(
+                  Icons.lock,
+                  color: DefaultAccentColor.textColor,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -198,7 +207,11 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: _signIn,
+              onPressed: () {
+                UserCred.setUserEmail(_correoController.text);
+                UserCred.setUserPasswd(_contrasenaController.text);
+                _signIn();
+              },
               child: Text(
                 'INGRESAR',
                 style: TextStyle(color: Colors.white),
@@ -316,4 +329,26 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+}
+
+class UserCred {
+  static String? userEmail;
+  static String? userPasswd;
+
+  static void setUserEmail(String? newUserEmail) {
+    userEmail = newUserEmail;
+  }
+
+  static void setUserPasswd(String? newUserPasswd) {
+    userPasswd = newUserPasswd;
+  }
+
+  static String? getUserEmail(){
+    return userEmail;
+  }
+  static String? getUserPasswd(){
+    return userPasswd;
+  }
+
+
 }

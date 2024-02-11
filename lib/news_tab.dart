@@ -7,12 +7,15 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_design/request_data.dart';
+import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/utils.dart';
 
 class NewsTab extends StatefulWidget {
@@ -70,7 +73,8 @@ class _NewsTabState extends State<NewsTab> {
   }
 
   Future<void> _showSavePhotoDialog(BuildContext context, XFile picture) async {
-    ImageProvider? img;
+    String itemsIndex = await ImageStore.getLastIndex();
+    String? imgBase64;
     List<int> bytes = SendToRest.readBytes(picture.path);
 
     return showDialog<void>(
@@ -95,7 +99,7 @@ class _NewsTabState extends State<NewsTab> {
                       Uint8List bytesDecoded =
                           base64Decode("${snapshot.data!}");
                       ImageProvider imageProvider = MemoryImage(bytesDecoded);
-                      img = imageProvider;
+                      imgBase64 = snapshot.data;
                       return Image(image: imageProvider);
                     }
                   },
@@ -107,15 +111,39 @@ class _NewsTabState extends State<NewsTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   FilledButton(
-                    style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
-                    onPressed: () {
+                    style: FilledButton.styleFrom(
+                        backgroundColor: DefaultAccentColor.accentPressed),
+                    onPressed: () async {
+                      // Upload to Firestore
+
+                      if (UserController.isSignedInWithGoogle) {
+                        final docRef = FirebaseFirestore.instance
+                            .collection('images')
+                            .doc(UserController.userId)
+                            .set({
+                          '$itemsIndex': {
+                            'base64img': imgBase64,
+                            'lastUsed': 'Ayer',
+                            'title': 'Camisa',
+                            'colors': {"blue", "black"}
+                          }
+                        }, SetOptions(merge: true));
+                      } else {
+                        await FirebaseFirestore.instance
+                            .collection('images')
+                            .doc(FirebaseAuthService.userId)
+                            .set({
+                          '2': {'fileName': '${picture.path.split('/').last}'}
+                        });
+                      }
 
                       Navigator.of(context).pop();
                     },
                     child: Text('Aceptar'),
                   ),
                   FilledButton(
-                    style: FilledButton.styleFrom(backgroundColor: DefaultAccentColor.accentPressed),
+                    style: FilledButton.styleFrom(
+                        backgroundColor: DefaultAccentColor.accentPressed),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -158,12 +186,18 @@ class _NewsTabState extends State<NewsTab> {
         centerTitle: true,
         title: Row(
           children: [
-            Text('Añadir', style: TextStyle(color: DefaultAccentColor.textColor),),
+            Text(
+              'Añadir',
+              style: TextStyle(color: DefaultAccentColor.textColor),
+            ),
             IconButton(
               onPressed: () {
                 _showSuggestionDialog(context);
               },
-              icon: Icon(Icons.info, color: DefaultAccentColor.textColor,),
+              icon: Icon(
+                Icons.info,
+                color: DefaultAccentColor.textColor,
+              ),
             ),
           ],
         ),
@@ -205,5 +239,24 @@ class _NewsTabState extends State<NewsTab> {
         ),
       ),
     );
+  }
+}
+
+class ImageStore {
+  static Future<String> getLastIndex() async {
+    try {
+      final userDocRef = FirebaseFirestore.instance
+          .collection("images")
+          .doc(UserController.userId);
+      DocumentSnapshot snapshot = await userDocRef.get();
+
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      int index = int.parse(data.entries.last.key);
+      index++;
+      return index.toString();
+    } catch (e) {
+      print(e);
+      return "0";
+    }
   }
 }

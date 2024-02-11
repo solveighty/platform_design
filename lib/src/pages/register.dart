@@ -119,15 +119,17 @@ class _RegisterState extends State<Register> {
               style: TextStyle(
                 fontFamily: 'Blacknorthdemo',
                 fontSize: 25.0,
-                color: Colors.black,
+                color: DefaultAccentColor.textColor,
               ),
             ),
             SizedBox(height: 20.0),
             TextField(
+              style: TextStyle(color: DefaultAccentColor.textColor),
               controller: _usuarioController,
               decoration: InputDecoration(
                 labelText: 'Usuario',
-                prefixIcon: Icon(Icons.verified_user),
+                prefixIcon: Icon(Icons.verified_user,
+                    color: DefaultAccentColor.textColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -135,10 +137,12 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 10.0),
             TextField(
+              style: TextStyle(color: DefaultAccentColor.textColor),
               controller: _nombre_apellidoController,
               decoration: InputDecoration(
                 labelText: 'Nombre y Apellido',
-                prefixIcon: Icon(Icons.person),
+                prefixIcon:
+                    Icon(Icons.person, color: DefaultAccentColor.textColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -146,10 +150,13 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 10.0),
             TextField(
+              style: TextStyle(color: DefaultAccentColor.textColor),
+              keyboardType: TextInputType.emailAddress,
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Correo Electrónico',
-                prefixIcon: Icon(Icons.alternate_email),
+                prefixIcon: Icon(Icons.alternate_email,
+                    color: DefaultAccentColor.textColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -157,11 +164,15 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 10.0),
             TextField(
+              style: TextStyle(color: DefaultAccentColor.textColor),
               controller: _contrasenaController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Contraseña',
-                prefixIcon: Icon(Icons.lock),
+                prefixIcon: Icon(
+                  Icons.lock,
+                  color: DefaultAccentColor.textColor,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
@@ -195,7 +206,10 @@ class _RegisterState extends State<Register> {
     String email = _emailController.text;
     String password = _contrasenaController.text;
 
-    if (username.isEmpty || nombre.isEmpty || email.isEmpty || password.isEmpty) {
+    if (username.isEmpty ||
+        nombre.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Llene los datos.'),
@@ -207,7 +221,8 @@ class _RegisterState extends State<Register> {
     if (username.length < 5) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Su nombre de usuario debe tener almenos 5 caracteres.'),
+          content: const Text(
+              'Su nombre de usuario debe tener almenos 5 caracteres.'),
         ),
       );
       return;
@@ -216,7 +231,8 @@ class _RegisterState extends State<Register> {
     if (password.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('La contraseña debe tener al menos 8 caracteres.'),
+          content:
+              const Text('La contraseña debe tener al menos 8 caracteres.'),
         ),
       );
       return;
@@ -231,16 +247,17 @@ class _RegisterState extends State<Register> {
       return;
     }
 
-    try{
-      User? user = await _auth.signUpWithEmailAndPasssword(email, password, context);
+    try {
+      User? user =
+          await _auth.signUpWithEmailAndPasssword(email, password, context);
 
       if (user != null) {
         await _guardarDatosUsuario(user.uid, username, nombre, email);
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => RegisterComplete()));
       }
-    }catch(e){
-      if (e is FirebaseAuthException && e.code == 'email-already-in-use'){
+    } catch (e) {
+      if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Este correo ya ha sido registrado anteriormente'),
