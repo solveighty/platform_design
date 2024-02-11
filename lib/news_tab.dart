@@ -76,6 +76,9 @@ class _NewsTabState extends State<NewsTab> {
     String itemsIndex = await ImageStore.getLastIndex();
     String? imgBase64;
     List<int> bytes = SendToRest.readBytes(picture.path);
+    String? clotheTitle;
+    String? clotheType;
+    List<String>? colorsList;
 
     return showDialog<void>(
         context: context,
@@ -97,9 +100,12 @@ class _NewsTabState extends State<NewsTab> {
                       return Text('Error loading image');
                     } else {
                       Uint8List bytesDecoded =
-                          base64Decode("${snapshot.data!}");
+                          base64Decode("${snapshot.data['data']!}");
                       ImageProvider imageProvider = MemoryImage(bytesDecoded);
-                      imgBase64 = snapshot.data;
+                      imgBase64 = snapshot.data['data'];
+                      clotheTitle = snapshot.data['title'];
+                      clotheType = snapshot.data['type'];
+                      colorsList = List<String>.from(snapshot.data['colors']);
                       return Image(image: imageProvider);
                     }
                   },
@@ -124,8 +130,9 @@ class _NewsTabState extends State<NewsTab> {
                           '$itemsIndex': {
                             'base64img': imgBase64,
                             'lastUsed': 'Ayer',
-                            'title': 'Camisa',
-                            'colors': {"blue", "black"}
+                            'title': '$clotheTitle',
+                            'type': '$clotheType',
+                            'colors': colorsList
                           }
                         }, SetOptions(merge: true));
                       } else {

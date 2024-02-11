@@ -17,14 +17,13 @@ class SendToRest {
     var url = Uri.parse('https://armario-rest.loophole.site/endpoint');
     final headers = {'Content-Type': 'application/json'};
     String base64img = base64Encode(imageBytes);
-    Map params = {'base64_data': '${base64img}'};
+    Map params = {'base64_data': '$base64img'};
     var body = json.encode(params);
     var response = await http.post(url, headers: headers, body: body);
     if (response.statusCode ==  200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
       Fluttertoast.showToast(msg: jsonResponse['message']);
-      print(jsonResponse['data']);
-      return jsonResponse['data'];
+      return jsonResponse;
     } else {
       print(response.body);
       Map<String, dynamic> jsonResponse = json.decode(response.body);
