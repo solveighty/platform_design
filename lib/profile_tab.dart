@@ -2,8 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/utils.dart';
 import 'details.dart';
 
@@ -52,6 +57,7 @@ class ProfileTab extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
+                ImagesStorage.getImagesCollection();
                 Navigator.pop(context);
               },
               child: Text('Cerrar'),
@@ -62,62 +68,79 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    return Scaffold(
-      backgroundColor: DefaultSelectionStyle.defaultColor,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(
-                child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 10,
-              ),
-              decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: DefaultAccentColor.defaultBackground,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10))),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    mainAxisExtent: 190),
-                itemBuilder: (context, index) {
-                  return RawMaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DetailsImg(
-                                  imagePath: _images[index].imagePath,
-                                  nombrePrenda: _images[index].nombrePrenda,
-                                  colorPrenda: _images[index].colorPrenda,
-                                  descripcionPrenda:
-                                      _images[index].descripcionPrenda)));
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(10),
-                          image: DecorationImage(
-                              isAntiAlias: true,
-                              filterQuality: FilterQuality.low,
-                              image: AssetImage(_images[index].imagePath),
-                              fit: BoxFit.cover)),
-                    ),
-                  );
+  Widget _buildImages(BuildContext context) {
+
+    return StreamBuilder<List<String>>(
+      stream: ImagesStorage.getImagesCollection(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<String> base64Strings = snapshot.data!;
+          return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+            ),
+            itemCount: base64Strings.length,
+            itemBuilder: (context, index) {
+              Uint8List bytes = base64Decode(base64Strings[index]);
+              ImageProvider img = MemoryImage(bytes);
+              return RawMaterialButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return SizedBox(
+                          child: ListView(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Image(
+                                        image: img,
+                                        height: 200,
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.only(left: 100)),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            "",
+                                            style: TextStyle(
+                                                color: DefaultAccentColor
+                                                    .textColor,
+                                            fontSize: 20),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      });
                 },
-                itemCount: _images.length,
-              ),
-            ))
-          ],
-        ),
-      ),
+                child: Container(
+                  decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(image: img)),
+                ),
+              );
+            },
+          );
+        } else if (snapshot.hasError) {
+          return Text('Error loading images');
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
     );
   }
 
@@ -147,7 +170,7 @@ class ProfileTab extends StatelessWidget {
           ],
         ),
       ),
-      body: _buildBody(context),
+      body: _buildImages(context),
     );
   }
 
@@ -170,7 +193,7 @@ class ProfileTab extends StatelessWidget {
           },
         ),
       ),
-      child: _buildBody(context),
+      child: _buildImages(context),
     );
   }
 
@@ -343,4 +366,26 @@ class ImageDetails {
       required this.nombrePrenda,
       required this.colorPrenda,
       required this.descripcionPrenda});
+}
+
+class ImagesStorage {
+  static Stream<List<String>> getImagesCollection() {
+    final userDocRef = FirebaseFirestore.instance
+        .collection("images")
+        .doc(UserController.userId);
+
+    return userDocRef.snapshots().map((snapshot) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      List<dynamic> base64ImagesDynamic = [];
+      data.forEach((key, value) {
+        base64ImagesDynamic.add(value['base64img']);
+      });
+      print(base64ImagesDynamic);
+
+      // Explicitly convert each dynamic element to a string
+      List<String> base64Images =
+          base64ImagesDynamic.map((image) => image.toString()).toList();
+      return base64Images;
+    });
+  }
 }

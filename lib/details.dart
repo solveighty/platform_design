@@ -2,14 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DetailsImg extends StatelessWidget {
+  late final Image img;
   late final String imagePath, nombrePrenda, descripcionPrenda;
   late final List<String> colorPrenda;
 
-  DetailsImg(
-      {required this.imagePath,
-      required this.nombrePrenda,
-      required this.colorPrenda,
-      required this.descripcionPrenda});
+  DetailsImg({
+    required this.img,
+  });
 
   @override
   Widget build(BuildContext context) {
