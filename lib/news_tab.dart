@@ -12,6 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_design/request_data.dart';
@@ -79,6 +80,8 @@ class _NewsTabState extends State<NewsTab> {
     String? clotheTitle;
     String? clotheType;
     List<String>? colorsList;
+    ImageProvider imgAfter =
+        NetworkImage("https://static.thenounproject.com/png/82078-200.png");
 
     return showDialog<void>(
         context: context,
@@ -102,6 +105,7 @@ class _NewsTabState extends State<NewsTab> {
                       Uint8List bytesDecoded =
                           base64Decode("${snapshot.data['data']!}");
                       ImageProvider imageProvider = MemoryImage(bytesDecoded);
+                      imgAfter = MemoryImage(bytesDecoded);
                       imgBase64 = snapshot.data['data'];
                       clotheTitle = snapshot.data['title'];
                       clotheType = snapshot.data['type'];
@@ -122,29 +126,180 @@ class _NewsTabState extends State<NewsTab> {
                     onPressed: () async {
                       // Upload to Firestore
 
-                      if (UserController.isSignedInWithGoogle) {
-                        final docRef = FirebaseFirestore.instance
-                            .collection('images')
-                            .doc(UserController.userId)
-                            .set({
-                          '$itemsIndex': {
-                            'base64img': imgBase64,
-                            'lastUsed': 'Ayer',
-                            'title': '$clotheTitle',
-                            'type': '$clotheType',
-                            'colors': colorsList
-                          }
-                        }, SetOptions(merge: true));
-                      } else {
-                        await FirebaseFirestore.instance
-                            .collection('images')
-                            .doc(FirebaseAuthService.userId)
-                            .set({
-                          '2': {'fileName': '${picture.path.split('/').last}'}
-                        });
-                      }
-
                       Navigator.of(context).pop();
+                      showModalBottomSheet(
+                          backgroundColor: DefaultAccentColor.defaultBackground,
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SizedBox(
+                                child: Padding(
+                              padding: EdgeInsets.all(25.0),
+                              child: ListView(
+                                children: [
+                                  Text(
+                                    "Ajusta las características",
+                                    style: TextStyle(
+                                        color: DefaultAccentColor.textColor,
+                                        fontSize: 23.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Padding(padding: EdgeInsets.only(top: 20)),
+                                  Image(
+                                    image: imgAfter,
+                                    height: 200,
+                                  ),
+                                  Padding(padding: EdgeInsets.only(bottom: 20)),
+                                  TextField(
+                                    style: TextStyle(
+                                        color: DefaultAccentColor.textColor),
+                                    controller: TextEditingController(
+                                        text: "$clotheTitle"),
+                                    decoration: InputDecoration(
+                                      labelText: 'Nombre de la prenda',
+                                      prefixIcon: Icon(
+                                        Icons.add,
+                                        color: DefaultAccentColor.textColor,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(padding: EdgeInsets.only(bottom: 20)),
+                                  TextField(
+                                    style: TextStyle(
+                                        color: DefaultAccentColor.textColor),
+                                    controller: TextEditingController(
+                                        text: "$clotheType"),
+                                    decoration: InputDecoration(
+                                      labelText: 'Tipo de la prenda',
+                                      prefixIcon: Icon(
+                                        Icons.add_photo_alternate_outlined,
+                                        color: DefaultAccentColor.textColor,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(padding: EdgeInsets.only(bottom: 15)),
+                                  Text(
+                                    "Colores",
+                                    style: TextStyle(
+                                        color: DefaultAccentColor.textColor),
+                                  ),
+                                  Padding(padding: EdgeInsets.only(bottom: 5)),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextButton.icon(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.close,
+                                            color: Colors.white, size: 20),
+                                        label: Text(
+                                          "negro",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        style: FilledButton.styleFrom(
+                                            backgroundColor: Colors.black),
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.only(right: 5)),
+                                      TextButton.icon(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.close,
+                                            color: Colors.white, size: 20),
+                                        label: Text(
+                                          "azul",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        style: FilledButton.styleFrom(
+                                            backgroundColor: Colors.blue),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(
+                                            Icons.add_circle_outline,
+                                            size: 30,
+                                          ))
+                                    ],
+                                  ),
+                                  Padding(
+                                      padding: EdgeInsets.only(bottom: 150)),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          child: FilledButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              style: FilledButton.styleFrom(
+                                                  backgroundColor:
+                                                      DefaultAccentColor
+                                                          .accentPressed),
+                                              child: Text(
+                                                "Cancelar",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ))),
+                                      Padding(
+                                          padding: EdgeInsets.only(left: 10)),
+                                      Expanded(
+                                          child: FilledButton(
+                                              onPressed: () async {
+                                                if (UserController
+                                                    .isSignedInWithGoogle) {
+                                                  final docRef =
+                                                      FirebaseFirestore.instance
+                                                          .collection('images')
+                                                          .doc(UserController
+                                                              .userId)
+                                                          .set({
+                                                    '$itemsIndex': {
+                                                      'base64img': imgBase64,
+                                                      'lastUsed': 'Ayer',
+                                                      'title': '$clotheTitle',
+                                                      'type': '$clotheType',
+                                                      'colors': colorsList
+                                                    }
+                                                  }, SetOptions(merge: true));
+                                                } else {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('images')
+                                                      .doc(FirebaseAuthService
+                                                          .userId)
+                                                      .set({
+                                                    '2': {
+                                                      'fileName':
+                                                          '${picture.path.split('/').last}'
+                                                    }
+                                                  });
+                                                }
+                                                Fluttertoast.showToast(
+                                                    msg:
+                                                        "Prenda guardada exitosamente");
+                                                Navigator.pop(context);
+                                              },
+                                              style: FilledButton.styleFrom(
+                                                  backgroundColor:
+                                                      DefaultAccentColor
+                                                          .accentPressed),
+                                              child: Text(
+                                                "Aceptar",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )))
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ));
+                          });
                     },
                     child: Text('Aceptar'),
                   ),
