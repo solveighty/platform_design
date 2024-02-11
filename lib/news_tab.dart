@@ -4,7 +4,6 @@
 
 import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -128,13 +127,14 @@ class _NewsTabState extends State<NewsTab> {
 
                       Navigator.of(context).pop();
                       showModalBottomSheet(
+                          enableDrag: true,
+                          showDragHandle: true,
                           backgroundColor: DefaultAccentColor.defaultBackground,
-                          isScrollControlled: true,
                           context: context,
                           builder: (BuildContext context) {
                             return SizedBox(
                                 child: Padding(
-                              padding: EdgeInsets.all(25.0),
+                              padding: EdgeInsets.only(left: 25, right: 25),
                               child: ListView(
                                 children: [
                                   Text(
@@ -230,7 +230,7 @@ class _NewsTabState extends State<NewsTab> {
                                     ],
                                   ),
                                   Padding(
-                                      padding: EdgeInsets.only(bottom: 150)),
+                                      padding: EdgeInsets.only(bottom: 20)),
                                   Row(
                                     children: [
                                       Expanded(

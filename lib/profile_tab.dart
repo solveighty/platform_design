@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:platform_design/songs_tab.dart';
 import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/utils.dart';
@@ -30,6 +31,8 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
+  String title = 'loading...';
+
   late StreamSubscription<User?> _authStateChangesSubscription;
 
   @override
@@ -57,7 +60,7 @@ class _ProfileTabState extends State<ProfileTab> {
           ),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
               },
               child: Text('Cerrar'),
@@ -106,8 +109,16 @@ class _ProfileTabState extends State<ProfileTab> {
                   Uint8List bytes = base64Decode(base64Strings[index]);
                   ImageProvider img = MemoryImage(bytes);
                   return RawMaterialButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      var s = await ImagesStorage.getFirestoreInfo(
+                          UserController.userId, index, "title");
+                      setState(() {
+                        title = s;
+                      });
+
                       showModalBottomSheet(
+                          enableDrag: true,
+                          showDragHandle: true,
                           context: context,
                           builder: (context) {
                             return SizedBox(
@@ -117,29 +128,44 @@ class _ProfileTabState extends State<ProfileTab> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 20, left: 20)),
+                                      Center(
+                                        child: Text(
+                                          "${title.toUpperCase()}",
+                                          style: GoogleFonts.oswald(
+                                              color: Colors.black54,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ),
+                                      Padding(padding: EdgeInsets.only(bottom: 20)),
                                       Row(
                                         children: [
-                                          Image(
-                                            image: img,
-                                            height: 200,
+                                          Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 20)),
+                                          Container(
+                                            child: Image(
+                                              image: img,
+                                              height: 200,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: Offset(4, 8))],
+                                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                                            ),
                                           ),
                                           Padding(
                                               padding:
-                                                  EdgeInsets.only(left: 100)),
+                                                  EdgeInsets.only(left: 20)),
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.end,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                "",
-                                                style: TextStyle(
-                                                    color: DefaultAccentColor
-                                                        .textColor,
-                                                    fontSize: 20),
-                                              )
-                                            ],
+                                            children: [],
                                           )
                                         ],
                                       ),
@@ -196,16 +222,22 @@ class ImagesStorage {
 
     return userDocRef.snapshots().map((snapshot) {
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-      List<dynamic> base64ImagesDynamic = [];
+      List<dynamic> base64List = [];
       data.forEach((key, value) {
-        base64ImagesDynamic.add(value['base64img']);
+        base64List.add(value['base64img']);
       });
-      print(base64ImagesDynamic);
-
-      // Explicitly convert each dynamic element to a string
       List<String> base64Images =
-          base64ImagesDynamic.map((image) => image.toString()).toList();
+          base64List.map((item) => item.toString()).toList();
       return base64Images;
     });
+  }
+
+  static getFirestoreInfo(String? userId, int index, String strvalue) async {
+    final userDocRef =
+        FirebaseFirestore.instance.collection("images").doc(userId);
+    DocumentSnapshot snapshot = await userDocRef.get();
+
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+    return data[index.toString()][strvalue];
   }
 }

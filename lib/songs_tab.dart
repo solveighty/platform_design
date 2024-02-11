@@ -5,7 +5,6 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:math';
@@ -67,7 +66,6 @@ class _SongsTabState extends State<SongsTab> {
 
   void sendUserPrompt(String message) async {
     var url = Uri.parse('https://asistentedemoda.loophole.site/api/generate');
-    String nombre = 'Andrew';
     Map params = {'model': 'moda', 'prompt': '$message', 'stream': false};
     var body = json.encode(params);
     // make http post request
@@ -135,39 +133,6 @@ class _SongsTabState extends State<SongsTab> {
     songNames = getRandomNames(_itemsLength);
   }
 
-  Future<void> _refreshData() {
-    return Future.delayed(
-      // This is just an arbitrary delay that simulates some network activity.
-      const Duration(seconds: 2),
-      () => setState(() => _setData()),
-    );
-  }
-
-  void _togglePlatform() {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      debugDefaultTargetPlatformOverride = TargetPlatform.android;
-    } else {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    }
-
-    // This rebuilds the application. This should obviously never be
-    // done in a real app but it's done here since this app
-    // unrealistically toggles the current platform for demonstration
-    // purposes.
-    WidgetsBinding.instance.reassembleApplication();
-  }
-
-  // ===========================================================================
-  // Non-shared code below because:
-  // - Android and iOS have different scaffolds
-  // - There are different items in the app bar / nav bar
-  // - Android has a hamburger drawer, iOS has bottom tabs
-  // - The iOS nav bar is scrollable, Android is not
-  // - Pull-to-refresh works differently, and Android has a button to trigger it too
-  //
-  // And these are all design time choices that doesn't have a single 'right'
-  // answer.
-  // ===========================================================================
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
         backgroundColor: DefaultAccentColor.defaultBackground,
@@ -319,6 +284,8 @@ class _SongsTabState extends State<SongsTab> {
                             textAlign: TextAlign.center),
                         onPressed: () {
                           showModalBottomSheet(
+                              enableDrag: true,
+                              showDragHandle: true,
                               context: context,
                               isScrollControlled: true,
                               builder: (BuildContext context) {
@@ -355,12 +322,6 @@ class _SongsTabState extends State<SongsTab> {
   }
 
   void _addMessage(types.Message message) {
-    setState(() {
-      _messages.insert(0, message);
-    });
-  }
-
-  void _addMessage2(types.Message message) {
     setState(() {
       _messages.insert(0, message);
     });
