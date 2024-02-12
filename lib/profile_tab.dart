@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:platform_design/songs_tab.dart';
 import 'package:platform_design/src/pages/google_auth.dart';
@@ -37,7 +38,6 @@ class _ProfileTabState extends State<ProfileTab> {
   List<String> colors = [];
   List<String>? RGBA;
   List<Color>? colorsD;
-
 
   late StreamSubscription<User?> _authStateChangesSubscription;
 
@@ -116,37 +116,68 @@ class _ProfileTabState extends State<ProfileTab> {
                   ImageProvider img = MemoryImage(bytes);
                   return RawMaterialButton(
                     onPressed: () async {
-                      var getTile = await ImagesStorage.getFirestoreInfo(
-                          UserController.userId, index, "title");
-                      var getType = await ImagesStorage.getFirestoreInfo(
-                          UserController.userId, index, "type");
-                      var getLastUsed = await ImagesStorage.getFirestoreInfo(
-                          UserController.userId, index, "lastUsed");
-                      List<dynamic> getRGBA = await ImagesStorage.getFirestoreInfo(
-                          UserController.userId, index, "RGBA");
-
-
-                      List<dynamic> listDynamic =
-                          await ImagesStorage.getFirestoreInfo(
-                              UserController.userId, index, "colors");
-                      List<String> colorsList =
-                          listDynamic.map((e) => e.toString()).toList();
-
+                      var getTile;
+                      var getType;
+                      var getLastUsed;
+                      List<String> colorsList;
+                      List<dynamic> getRGBA;
+                      List<dynamic> listDynamic;
+                      if (UserController.isSignedInWithGoogle) {
+                        getTile = await ImagesStorage.getFirestoreInfo(
+                            UserController.userId, index, "title");
+                        getType = await ImagesStorage.getFirestoreInfo(
+                            UserController.userId, index, "type");
+                        getLastUsed = await ImagesStorage.getFirestoreInfo(
+                            UserController.userId, index, "lastUsed");
+                        getRGBA = await ImagesStorage.getFirestoreInfo(
+                            UserController.userId, index, "RGBA");
+                        listDynamic = await ImagesStorage.getFirestoreInfo(
+                            UserController.userId, index, "colors");
+                        colorsList =
+                            listDynamic.map((e) => e.toString()).toList();
+                      } else {
+                        getTile = await ImagesStorage.getFirestoreInfo(
+                            FirebaseAuthService.userId, index, "title");
+                        getType = await ImagesStorage.getFirestoreInfo(
+                            FirebaseAuthService.userId, index, "type");
+                        getLastUsed = await ImagesStorage.getFirestoreInfo(
+                            FirebaseAuthService.userId, index, "lastUsed");
+                        getRGBA = await ImagesStorage.getFirestoreInfo(
+                            FirebaseAuthService.userId, index, "RGBA");
+                        listDynamic = await ImagesStorage.getFirestoreInfo(
+                            FirebaseAuthService.userId, index, "colors");
+                        colorsList =
+                            listDynamic.map((e) => e.toString()).toList();
+                      }
                       setState(() {
                         title = getTile;
                         type = getType;
                         lastUsed = getLastUsed;
                         colors = colorsList;
                         RGBA = getRGBA.cast<String>();
-                        colorsD = RGBA?.map((rgbaString) {
-                          var rgbaValues = rgbaString.substring(5, rgbaString.length -  1).split(', ');
-                          return Color.fromRGBO(
-                              int.parse(rgbaValues[0]),
-                              int.parse(rgbaValues[1]),
-                              int.parse(rgbaValues[2]),
-                              double.parse(rgbaValues[3])
-                          );
-                        }).toList();
+                        try {
+                          colorsD = RGBA?.map((rgbaString) {
+                            var rgbaValues = rgbaString
+                                .substring(5, rgbaString.length - 1)
+                                .split(', ');
+                            return Color.fromRGBO(
+                                int.parse(rgbaValues[0]),
+                                int.parse(rgbaValues[1]),
+                                int.parse(rgbaValues[2]),
+                                double.parse(rgbaValues[3]));
+                          }).toList();
+                        } catch (e) {
+                          colorsD = RGBA?.map((rgbaString) {
+                            var rgbaValues = rgbaString
+                                .substring(5, rgbaString.length - 1)
+                                .split(', ');
+                            return Color.fromRGBO(
+                                0,
+                                0,
+                                0,
+                                1);
+                          }).toList();
+                        }
                       });
 
                       showModalBottomSheet(
@@ -159,16 +190,59 @@ class _ProfileTabState extends State<ProfileTab> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Padding(
-                                        padding:
-                                            EdgeInsets.only(top: 10, left: 20)),
-                                    Center(
-                                      child: Text(
-                                        "${title.toUpperCase()}",
-                                        style: GoogleFonts.oswald(
-                                            color: Colors.black54,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w400),
+                                    Container(
+                                      height: 40,
+                                      child: Stack(
+                                        alignment: Alignment.centerLeft,
+                                        // Aligns the text to the start of the stack
+                                        children: [
+                                          Center(
+                                            child: Text(
+                                              "${title.toUpperCase()}",
+                                              style: GoogleFonts.oswald(
+                                                  color: Colors.black54,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 0,
+                                            // Positions the button at the end of the stack
+                                            child: Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 10),
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  if (UserController
+                                                      .isSignedInWithGoogle) {
+                                                    ImagesStorage
+                                                        .deleteFirestoreItem(
+                                                            UserController
+                                                                .userId,
+                                                            index.toString());
+                                                  } else {
+                                                    ImagesStorage
+                                                        .deleteFirestoreItem(
+                                                            FirebaseAuthService
+                                                                .userId,
+                                                            index.toString());
+                                                  }
+                                                  Fluttertoast.showToast(
+                                                      msg:
+                                                          "Prenda eliminada exitosamente");
+                                                  Navigator.pop(context);
+                                                },
+                                                icon:
+                                                    Icon(CupertinoIcons.trash),
+                                                color: DefaultAccentColor
+                                                    .defaultBackground,
+                                                style: IconButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.red[400]),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Padding(
@@ -303,24 +377,25 @@ class _ProfileTabState extends State<ProfileTab> {
                                         scrollDirection: Axis.horizontal,
                                         child: Row(
                                           children: [
-                                            Padding(padding: EdgeInsets.only(left: 20)),
+                                            Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 20)),
                                             Wrap(
                                               spacing: 8.0,
                                               runSpacing: 4.0,
-                                              children:
-                                              colorsList.map((e) {
-                                                int cIndex = colorsList.indexOf(e) ?? 0;
+                                              children: colorsList.map((e) {
+                                                int cIndex =
+                                                    colorsList.indexOf(e) ?? 0;
                                                 return TextButton(
                                                   onPressed: () {},
                                                   child: Text(
                                                     "${e.toString()}",
                                                     style: TextStyle(
-                                                        color:
-                                                        Colors.white),
+                                                        color: Colors.white),
                                                   ),
-                                                  style: FilledButton
-                                                      .styleFrom(
-                                                      backgroundColor: colorsD?[cIndex]),
+                                                  style: FilledButton.styleFrom(
+                                                      backgroundColor:
+                                                          colorsD?[cIndex]),
                                                 );
                                               }).toList(),
                                             )
@@ -395,5 +470,13 @@ class ImagesStorage {
 
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     return data[index.toString()][strvalue];
+  }
+
+  static deleteFirestoreItem(String? userId, String fieldKey) async {
+    final userDocRef =
+        FirebaseFirestore.instance.collection("images").doc(userId);
+    DocumentSnapshot snapshot = await userDocRef.get();
+
+    await userDocRef.update({fieldKey: FieldValue.delete()});
   }
 }
