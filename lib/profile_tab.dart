@@ -35,6 +35,9 @@ class _ProfileTabState extends State<ProfileTab> {
   String type = 'loading...';
   String lastUsed = 'loading...';
   List<String> colors = [];
+  List<String>? RGBA;
+  List<Color>? colorsD;
+
 
   late StreamSubscription<User?> _authStateChangesSubscription;
 
@@ -119,6 +122,10 @@ class _ProfileTabState extends State<ProfileTab> {
                           UserController.userId, index, "type");
                       var getLastUsed = await ImagesStorage.getFirestoreInfo(
                           UserController.userId, index, "lastUsed");
+                      List<dynamic> getRGBA = await ImagesStorage.getFirestoreInfo(
+                          UserController.userId, index, "RGBA");
+
+
                       List<dynamic> listDynamic =
                           await ImagesStorage.getFirestoreInfo(
                               UserController.userId, index, "colors");
@@ -130,6 +137,16 @@ class _ProfileTabState extends State<ProfileTab> {
                         type = getType;
                         lastUsed = getLastUsed;
                         colors = colorsList;
+                        RGBA = getRGBA.cast<String>();
+                        colorsD = RGBA?.map((rgbaString) {
+                          var rgbaValues = rgbaString.substring(5, rgbaString.length -  1).split(', ');
+                          return Color.fromRGBO(
+                              int.parse(rgbaValues[0]),
+                              int.parse(rgbaValues[1]),
+                              int.parse(rgbaValues[2]),
+                              double.parse(rgbaValues[3])
+                          );
+                        }).toList();
                       });
 
                       showModalBottomSheet(
@@ -282,39 +299,33 @@ class _ProfileTabState extends State<ProfileTab> {
                                         ],
                                       ),
                                     ),
-                                    Row(
-                                      children: [
-                                        Padding(
-                                            padding: EdgeInsets.only(left: 20)),
-                                        SingleChildScrollView(
-                                          child: Expanded(
-                                            child: Row(
-                                              children: [
-                                                Wrap(
-                                                  spacing: 8.0,
-                                                  runSpacing: 4.0,
-                                                  children: colorsList.map((e) {
-                                                    return TextButton(
-                                                      onPressed: () {},
-                                                      child: Text(
-                                                        "${e.toString()}",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      style: FilledButton
-                                                          .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.black),
-                                                    );
-                                                  }).toList(),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
+                                    SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: [
+                                            Padding(padding: EdgeInsets.only(left: 20)),
+                                            Wrap(
+                                              spacing: 8.0,
+                                              runSpacing: 4.0,
+                                              children:
+                                              colorsList.map((e) {
+                                                int cIndex = colorsList.indexOf(e) ?? 0;
+                                                return TextButton(
+                                                  onPressed: () {},
+                                                  child: Text(
+                                                    "${e.toString()}",
+                                                    style: TextStyle(
+                                                        color:
+                                                        Colors.white),
+                                                  ),
+                                                  style: FilledButton
+                                                      .styleFrom(
+                                                      backgroundColor: colorsD?[cIndex]),
+                                                );
+                                              }).toList(),
+                                            )
+                                          ],
+                                        ))
                                   ],
                                 ),
                               ],

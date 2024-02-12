@@ -77,6 +77,10 @@ class _NewsTabState extends State<NewsTab> {
     String? clotheTitle;
     String? clotheType;
     List<String>? colorsList;
+    List<String>? RGBA;
+    List<Color>? colors;
+    int index2;
+
     ImageProvider imgAfter =
         NetworkImage("https://static.thenounproject.com/png/82078-200.png");
 
@@ -108,6 +112,16 @@ class _NewsTabState extends State<NewsTab> {
                       clotheType = snapshot.data['type'];
                       colorsList =
                           List<String>.from(snapshot.data['colors']) ?? [];
+                      RGBA = List<String>.from(snapshot.data['RGBA']) ?? [];
+                      colors = RGBA?.map((rgbaString) {
+                        var rgbaValues = rgbaString.substring(5, rgbaString.length -  1).split(', ');
+                        return Color.fromRGBO(
+                            int.parse(rgbaValues[0]),
+                            int.parse(rgbaValues[1]),
+                            int.parse(rgbaValues[2]),
+                            double.parse(rgbaValues[3])
+                        );
+                      }).toList();
                       return Image(image: imageProvider);
                     }
                   },
@@ -199,6 +213,7 @@ class _NewsTabState extends State<NewsTab> {
                                           spacing: 8.0,
                                           runSpacing: 4.0,
                                           children: colorsList!.map((e) {
+                                            int index = colorsList?.indexOf(e) ?? 0;
                                             return TextButton.icon(
                                               onPressed: () {},
                                               icon: Icon(Icons.close,
@@ -211,7 +226,7 @@ class _NewsTabState extends State<NewsTab> {
                                               ),
                                               style: FilledButton.styleFrom(
                                                   backgroundColor:
-                                                      Colors.black),
+                                                      colors?[index]),
                                             );
                                           }).toList(),
                                         ),
@@ -242,7 +257,8 @@ class _NewsTabState extends State<NewsTab> {
                                                       'lastUsed': 'Ayer',
                                                       'title': '$clotheTitle',
                                                       'type': '$clotheType',
-                                                      'colors': colorsList
+                                                      'colors': colorsList,
+                                                      'RGBA': RGBA
                                                     }
                                                   }, SetOptions(merge: true));
                                                 } else {
@@ -256,7 +272,8 @@ class _NewsTabState extends State<NewsTab> {
                                                       'lastUsed': 'Ayer',
                                                       'title': '$clotheTitle',
                                                       'type': '$clotheType',
-                                                      'colors': colorsList
+                                                      'colors': colorsList,
+                                                      'RGBA': RGBA
                                                     }
                                                   }, SetOptions(merge: true));
                                                 }
