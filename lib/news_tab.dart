@@ -3,11 +3,9 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
-import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -108,7 +106,8 @@ class _NewsTabState extends State<NewsTab> {
                       imgBase64 = snapshot.data['data'];
                       clotheTitle = snapshot.data['title'];
                       clotheType = snapshot.data['type'];
-                      colorsList = List<String>.from(snapshot.data['colors']);
+                      colorsList =
+                          List<String>.from(snapshot.data['colors']) ?? [];
                       return Image(image: imageProvider);
                     }
                   },
@@ -192,73 +191,52 @@ class _NewsTabState extends State<NewsTab> {
                                         color: DefaultAccentColor.textColor),
                                   ),
                                   Padding(padding: EdgeInsets.only(bottom: 5)),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TextButton.icon(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.close,
-                                            color: Colors.white, size: 20),
-                                        label: Text(
-                                          "negro",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        style: FilledButton.styleFrom(
-                                            backgroundColor: Colors.black),
-                                      ),
-                                      Padding(
-                                          padding: EdgeInsets.only(right: 5)),
-                                      TextButton.icon(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.close,
-                                            color: Colors.white, size: 20),
-                                        label: Text(
-                                          "azul",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        style: FilledButton.styleFrom(
-                                            backgroundColor: Colors.blue),
-                                      ),
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(
-                                            Icons.add_circle_outline,
-                                            size: 30,
-                                          ))
-                                    ],
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.only(bottom: 20)),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: FilledButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              style: FilledButton.styleFrom(
-                                                  backgroundColor:
-                                                      DefaultAccentColor
-                                                          .accentPressed),
-                                              child: Text(
-                                                "Cancelar",
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        Wrap(
+                                          spacing: 8.0,
+                                          runSpacing: 4.0,
+                                          children: colorsList!.map((e) {
+                                            return TextButton.icon(
+                                              onPressed: () {},
+                                              icon: Icon(Icons.close,
+                                                  color: Colors.white,
+                                                  size: 20),
+                                              label: Text(
+                                                "${e.toString()}",
                                                 style: TextStyle(
                                                     color: Colors.white),
-                                              ))),
-                                      Padding(
-                                          padding: EdgeInsets.only(left: 10)),
+                                              ),
+                                              style: FilledButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.black),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(
+                                              Icons.add_circle_outline,
+                                              size: 30,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(padding: EdgeInsets.only(bottom: 20)),
+                                  Row(
+                                    children: [
                                       Expanded(
                                           child: FilledButton(
                                               onPressed: () async {
                                                 if (UserController
                                                     .isSignedInWithGoogle) {
-                                                  final docRef =
-                                                      FirebaseFirestore.instance
-                                                          .collection('images')
-                                                          .doc(UserController
-                                                              .userId)
-                                                          .set({
+                                                  FirebaseFirestore.instance
+                                                      .collection('images')
+                                                      .doc(
+                                                          UserController.userId)
+                                                      .set({
                                                     '$itemsIndex': {
                                                       'base64img': imgBase64,
                                                       'lastUsed': 'Ayer',
@@ -268,17 +246,19 @@ class _NewsTabState extends State<NewsTab> {
                                                     }
                                                   }, SetOptions(merge: true));
                                                 } else {
-                                                  await FirebaseFirestore
-                                                      .instance
+                                                  FirebaseFirestore.instance
                                                       .collection('images')
-                                                      .doc(FirebaseAuthService
-                                                          .userId)
+                                                      .doc(
+                                                          UserController.userId)
                                                       .set({
-                                                    '2': {
-                                                      'fileName':
-                                                          '${picture.path.split('/').last}'
+                                                    '$itemsIndex': {
+                                                      'base64img': imgBase64,
+                                                      'lastUsed': 'Ayer',
+                                                      'title': '$clotheTitle',
+                                                      'type': '$clotheType',
+                                                      'colors': colorsList
                                                     }
-                                                  });
+                                                  }, SetOptions(merge: true));
                                                 }
                                                 Fluttertoast.showToast(
                                                     msg:
@@ -377,11 +357,11 @@ class _NewsTabState extends State<NewsTab> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.only(bottom: 55), // Camera Button
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FloatingActionButton(
+            Expanded(
+                child: MaterialButton(
               onPressed: () async {
                 try {
                   await _takePicture();
@@ -394,8 +374,7 @@ class _NewsTabState extends State<NewsTab> {
                 size: 50,
                 color: DefaultAccentColor.accentPressed,
               ),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
+            )
             ),
           ],
         ),

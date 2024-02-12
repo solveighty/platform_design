@@ -32,6 +32,9 @@ class ProfileTab extends StatefulWidget {
 
 class _ProfileTabState extends State<ProfileTab> {
   String title = 'loading...';
+  String type = 'loading...';
+  String lastUsed = 'loading...';
+  List<String> colors = [];
 
   late StreamSubscription<User?> _authStateChangesSubscription;
 
@@ -110,10 +113,23 @@ class _ProfileTabState extends State<ProfileTab> {
                   ImageProvider img = MemoryImage(bytes);
                   return RawMaterialButton(
                     onPressed: () async {
-                      var s = await ImagesStorage.getFirestoreInfo(
+                      var getTile = await ImagesStorage.getFirestoreInfo(
                           UserController.userId, index, "title");
+                      var getType = await ImagesStorage.getFirestoreInfo(
+                          UserController.userId, index, "type");
+                      var getLastUsed = await ImagesStorage.getFirestoreInfo(
+                          UserController.userId, index, "lastUsed");
+                      List<dynamic> listDynamic =
+                          await ImagesStorage.getFirestoreInfo(
+                              UserController.userId, index, "colors");
+                      List<String> colorsList =
+                          listDynamic.map((e) => e.toString()).toList();
+
                       setState(() {
-                        title = s;
+                        title = getTile;
+                        type = getType;
+                        lastUsed = getLastUsed;
+                        colors = colorsList;
                       });
 
                       showModalBottomSheet(
@@ -121,27 +137,27 @@ class _ProfileTabState extends State<ProfileTab> {
                           showDragHandle: true,
                           context: context,
                           builder: (context) {
-                            return SizedBox(
-                              child: ListView(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 20, left: 20)),
-                                      Center(
-                                        child: Text(
-                                          "${title.toUpperCase()}",
-                                          style: GoogleFonts.oswald(
-                                              color: Colors.black54,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w400),
-                                        ),
+                            return ListView(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 20)),
+                                    Center(
+                                      child: Text(
+                                        "${title.toUpperCase()}",
+                                        style: GoogleFonts.oswald(
+                                            color: Colors.black54,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w400),
                                       ),
-                                      Padding(padding: EdgeInsets.only(bottom: 20)),
-                                      Row(
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.only(bottom: 20)),
+                                    IntrinsicHeight(
+                                      child: Row(
                                         children: [
                                           Padding(
                                               padding:
@@ -153,26 +169,155 @@ class _ProfileTabState extends State<ProfileTab> {
                                             ),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: Offset(4, 8))],
-                                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.1),
+                                                    blurRadius: 10,
+                                                    offset: Offset(4, 8))
+                                              ],
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20)),
                                             ),
                                           ),
                                           Padding(
                                               padding:
                                                   EdgeInsets.only(left: 20)),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [],
-                                          )
+                                          Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                      padding: EdgeInsets.only(
+                                                          top: 20),
+                                                      width: 200,
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Text(
+                                                        "TIPO:",
+                                                        style: GoogleFonts
+                                                            .inriaSans(
+                                                          color: Colors.black38,
+                                                          fontSize: 17,
+                                                        ),
+                                                      )),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                      padding: EdgeInsets.only(
+                                                          left: 50),
+                                                      width: 200,
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Text(
+                                                        "${type.toUpperCase()}",
+                                                        style:
+                                                            GoogleFonts.nunito(
+                                                          color: Colors.black87,
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      )),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                      padding: EdgeInsets.only(
+                                                          top: 20),
+                                                      width: 200,
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Text(
+                                                        "ÚLTIMO USO:",
+                                                        style: GoogleFonts
+                                                            .inriaSans(
+                                                          color: Colors.black38,
+                                                          fontSize: 17,
+                                                        ),
+                                                      )),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                      padding: EdgeInsets.only(
+                                                          left: 50, top: 15),
+                                                      width: 200,
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Text(
+                                                        "${lastUsed.toUpperCase()}",
+                                                        style:
+                                                            GoogleFonts.nunito(
+                                                          color: Colors.black87,
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      )),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ],
                                       ),
-                                    ],
-                                  )
-                                ],
-                              ),
+                                    ),
+                                    IntrinsicWidth(
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 40, left: 20)),
+                                          Text(
+                                            "COLORES:",
+                                            style: GoogleFonts.inriaSans(
+                                              color: Colors.black38,
+                                              fontSize: 17,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Padding(
+                                            padding: EdgeInsets.only(left: 20)),
+                                        SingleChildScrollView(
+                                          child: Expanded(
+                                            child: Row(
+                                              children: [
+                                                Wrap(
+                                                  spacing: 8.0,
+                                                  runSpacing: 4.0,
+                                                  children: colorsList.map((e) {
+                                                    return TextButton(
+                                                      onPressed: () {},
+                                                      child: Text(
+                                                        "${e.toString()}",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      style: FilledButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.black),
+                                                    );
+                                                  }).toList(),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
                             );
                           });
                     },
