@@ -433,18 +433,6 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 }
 
-class ImageDetails {
-  late final String imagePath;
-  late final String nombrePrenda;
-  late final List<String> colorPrenda;
-  late final String descripcionPrenda;
-
-  ImageDetails(
-      {required this.imagePath,
-      required this.nombrePrenda,
-      required this.colorPrenda,
-      required this.descripcionPrenda});
-}
 
 class ImagesStorage {
   static Stream<List<String>> getImagesCollection(String? userId) {

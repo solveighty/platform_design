@@ -75,6 +75,7 @@ class _NewsTabState extends State<NewsTab> {
 
   Future<void> _takePicture() async {
     try {
+      _isEnabled = ValueNotifier<bool>(true);
       await _initializeControllerFuture;
       final XFile picture = await _controller.takePicture();
       await _showSavePhotoDialog(context, picture);
@@ -90,7 +91,7 @@ class _NewsTabState extends State<NewsTab> {
     String? clotheTitle;
     String? clotheType;
     List<String>? colorsList;
-    List<String>? RGBA;
+    List<String>? RGBA = [];
     List<Color>? colors;
     int index2;
 

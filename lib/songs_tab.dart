@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:platform_design/profile_tab.dart';
 import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/src/pages/startpage.dart';
 import 'utils.dart';
@@ -43,6 +46,8 @@ class _SongsTabState extends State<SongsTab> {
   final _user = const types.User(id: '82091008-a484-4a89-ae75-a22bf8d6f3ac');
   final _user2 = const types.User(id: 'i192039-a484-4a89-ae75-a22bf8d6f3ac');
   bool _isEnabled = true;
+  String title = 'loading...';
+
 
   late StreamSubscription<User?> _authStateChangesSubscription;
 
@@ -103,12 +108,13 @@ class _SongsTabState extends State<SongsTab> {
     _addMessage(promptMessage);
   }
 
-  void sendCombinacion() {
+  void sendCombinacion(String title) {
+    String highlightedTitle = '👚' + title + '👚';
     final sugerirMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: randomString(),
-      text: "",
+      text: "¿Con que podría combinar la siguiente prenda de ropa? \n\n $highlightedTitle",
     );
     _addMessage(sugerirMessage);
   }
@@ -287,29 +293,95 @@ class _SongsTabState extends State<SongsTab> {
                               enableDrag: true,
                               showDragHandle: true,
                               context: context,
-                              isScrollControlled: true,
-                              builder: (BuildContext context) {
-                                return SizedBox(
-                                    height: 400,
-                                    child: Padding(
-                                      padding: EdgeInsets.all(25.0),
-                                      child: ListView(
+                              builder: (context) {
+                                return Column(
+                                  children: [
+                                    Container(
+                                      height: 40,
+                                      child: Stack(
+                                        alignment: Alignment.centerLeft,
+                                        // Aligns the text to the start of the stack
                                         children: [
-                                          Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Elije una prenda",
-                                                  style: TextStyle(
-                                                      fontSize: 23.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                )
-                                              ])
+                                          Center(
+                                            child: Text(
+                                              "Selecciona un prenda",
+                                              style: GoogleFonts.oswald(
+                                                  color: Colors.black54,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                    ));
+                                    ),
+                                    StreamBuilder<List<String>>(
+                                      stream: UserController
+                                          .isSignedInWithGoogle
+                                          ? ImagesStorage.getImagesCollection(
+                                          UserController.userId)
+                                          : ImagesStorage.getImagesCollection(
+                                          FirebaseAuthService.userId),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          List<String> base64Strings =
+                                          snapshot.data!;
+                                          return Expanded(child: GridView.builder(
+                                            shrinkWrap: true,
+                                              gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 3),
+                                              itemCount: base64Strings.length,
+                                              itemBuilder: (context, index) {
+                                                Uint8List bytes = base64Decode(
+                                                    base64Strings[index]);
+                                                ImageProvider img =
+                                                MemoryImage(bytes);
+                                                return RawMaterialButton(
+                                                  onPressed: () async {
+                                                    var getTile;
+                                                    if (UserController.isSignedInWithGoogle) {
+                                                      getTile = await ImagesStorage.getFirestoreInfo(
+                                                          UserController.userId, index, "title");
+                                                    } else {
+                                                      getTile = await ImagesStorage.getFirestoreInfo(
+                                                          FirebaseAuthService.userId, index, "title");
+                                                    }
+                                                    setState(() {
+                                                      title = getTile;
+                                                    });
+
+                                                    sendCombinacion(title);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                          10),
+                                                      image: DecorationImage(
+                                                          image: img),
+                                                    ),
+                                                  ),
+                                                );
+                                              }));
+                                        } else if (!snapshot.hasData) {
+                                          return Center(
+                                            child: Text(
+                                              'No has registrado ninguna imagen',
+                                              style: TextStyle(
+                                                  color: Colors.black38),
+                                            ),
+                                          );
+                                        } else {
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                      },
+                                    )
+
+                                  ],
+                                );
                               });
                         }),
                   ),
