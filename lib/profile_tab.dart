@@ -106,9 +106,13 @@ class _ProfileTabState extends State<ProfileTab> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<String> base64Strings = snapshot.data!;
-              return GridView.builder(
+              return Padding(padding: EdgeInsets.only(left: 20, right: 20),
+              child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 5.0,
+                  childAspectRatio: 0.75,
                 ),
                 itemCount: base64Strings.length,
                 itemBuilder: (context, index) {
@@ -171,11 +175,7 @@ class _ProfileTabState extends State<ProfileTab> {
                             var rgbaValues = rgbaString
                                 .substring(5, rgbaString.length - 1)
                                 .split(', ');
-                            return Color.fromRGBO(
-                                0,
-                                0,
-                                0,
-                                1);
+                            return Color.fromRGBO(0, 0, 0, 1);
                           }).toList();
                         }
                       });
@@ -210,35 +210,35 @@ class _ProfileTabState extends State<ProfileTab> {
                                             // Positions the button at the end of the stack
                                             child: Padding(
                                               padding:
-                                                  EdgeInsets.only(right: 10),
+                                              EdgeInsets.only(right: 10),
                                               child: IconButton(
                                                 onPressed: () {
                                                   if (UserController
                                                       .isSignedInWithGoogle) {
                                                     ImagesStorage
                                                         .deleteFirestoreItem(
-                                                            UserController
-                                                                .userId,
-                                                            index.toString());
+                                                        UserController
+                                                            .userId,
+                                                        index.toString());
                                                   } else {
                                                     ImagesStorage
                                                         .deleteFirestoreItem(
-                                                            FirebaseAuthService
-                                                                .userId,
-                                                            index.toString());
+                                                        FirebaseAuthService
+                                                            .userId,
+                                                        index.toString());
                                                   }
                                                   Fluttertoast.showToast(
                                                       msg:
-                                                          "Prenda eliminada exitosamente");
+                                                      "Prenda eliminada exitosamente");
                                                   Navigator.pop(context);
                                                 },
                                                 icon:
-                                                    Icon(CupertinoIcons.trash),
+                                                Icon(CupertinoIcons.trash),
                                                 color: DefaultAccentColor
                                                     .defaultBackground,
                                                 style: IconButton.styleFrom(
                                                     backgroundColor:
-                                                        Colors.red[400]),
+                                                    Colors.red[400]),
                                               ),
                                             ),
                                           ),
@@ -252,7 +252,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                         children: [
                                           Padding(
                                               padding:
-                                                  EdgeInsets.only(left: 20)),
+                                              EdgeInsets.only(left: 20)),
                                           Container(
                                             child: Image(
                                               image: img,
@@ -273,7 +273,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                           ),
                                           Padding(
                                               padding:
-                                                  EdgeInsets.only(left: 20)),
+                                              EdgeInsets.only(left: 20)),
                                           Column(
                                             children: [
                                               Row(
@@ -283,7 +283,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                                           top: 20),
                                                       width: 200,
                                                       alignment:
-                                                          Alignment.topLeft,
+                                                      Alignment.topLeft,
                                                       child: Text(
                                                         "TIPO:",
                                                         style: GoogleFonts
@@ -301,15 +301,15 @@ class _ProfileTabState extends State<ProfileTab> {
                                                           left: 50),
                                                       width: 200,
                                                       alignment:
-                                                          Alignment.topLeft,
+                                                      Alignment.topLeft,
                                                       child: Text(
                                                         "${type.toUpperCase()}",
                                                         style:
-                                                            GoogleFonts.nunito(
+                                                        GoogleFonts.nunito(
                                                           color: Colors.black87,
                                                           fontSize: 17,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                         ),
                                                       )),
                                                 ],
@@ -321,7 +321,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                                           top: 20),
                                                       width: 200,
                                                       alignment:
-                                                          Alignment.topLeft,
+                                                      Alignment.topLeft,
                                                       child: Text(
                                                         "ÚLTIMO USO:",
                                                         style: GoogleFonts
@@ -339,15 +339,15 @@ class _ProfileTabState extends State<ProfileTab> {
                                                           left: 50, top: 15),
                                                       width: 200,
                                                       alignment:
-                                                          Alignment.topLeft,
+                                                      Alignment.topLeft,
                                                       child: Text(
                                                         "${lastUsed.toUpperCase()}",
                                                         style:
-                                                            GoogleFonts.nunito(
+                                                        GoogleFonts.nunito(
                                                           color: Colors.black87,
                                                           fontSize: 17,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                         ),
                                                       )),
                                                 ],
@@ -379,7 +379,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                           children: [
                                             Padding(
                                                 padding:
-                                                    EdgeInsets.only(left: 20)),
+                                                EdgeInsets.only(left: 20)),
                                             Wrap(
                                               spacing: 8.0,
                                               runSpacing: 4.0,
@@ -395,7 +395,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                                   ),
                                                   style: FilledButton.styleFrom(
                                                       backgroundColor:
-                                                          colorsD?[cIndex]),
+                                                      colorsD?[cIndex]),
                                                 );
                                               }).toList(),
                                             )
@@ -408,14 +408,21 @@ class _ProfileTabState extends State<ProfileTab> {
                           });
                     },
                     child: Container(
+                      height: 400,
                       decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 2,
+                                offset: Offset(2, 3))
+                          ],
                           image: DecorationImage(image: img)),
                     ),
                   );
                 },
-              );
+              ));
             } else if (!snapshot.hasData) {
               return Center(
                 child: Text(
@@ -432,7 +439,6 @@ class _ProfileTabState extends State<ProfileTab> {
         ));
   }
 }
-
 
 class ImagesStorage {
   static Stream<List<String>> getImagesCollection(String? userId) {

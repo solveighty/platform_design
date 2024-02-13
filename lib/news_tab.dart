@@ -34,6 +34,7 @@ class _NewsTabState extends State<NewsTab> {
   late Future<void> _initializeControllerFuture;
   late StreamSubscription<User?> _authStateChangesSubscription;
   ValueNotifier<bool> _isEnabled = ValueNotifier<bool>(true);
+  double _value = 1;
 
   void toggleEnabled() {
     _isEnabled.value = !_isEnabled.value;
@@ -131,8 +132,8 @@ class _NewsTabState extends State<NewsTab> {
                       clotheType = snapshot.data['type'];
                       colorsList =
                           List<String>.from(snapshot.data['colors']) ?? [];
-                      RGBA = List<String>.from(snapshot.data['RGBA']) ?? [];
                       try {
+                        RGBA = List<String>.from(snapshot.data['RGBA']) ?? [];
                         colors = RGBA?.map((rgbaString) {
                           var rgbaValues = rgbaString.substring(
                               5, rgbaString.length - 1).split(', ');
@@ -236,6 +237,28 @@ class _NewsTabState extends State<NewsTab> {
                                             ),
                                           ),
                                           Padding(padding: EdgeInsets.only(bottom: 15)),
+                                          Text(
+                                            "Elija una posición:",
+                                            style: TextStyle(
+                                                color: DefaultAccentColor.textColor),
+                                          ),
+                                          StatefulBuilder(
+                                            builder: (context, state) => Center(
+                                              child: Slider(
+                                                activeColor: DefaultAccentColor.accentPressed,
+                                                value: _value,
+                                                min: 1.0,
+                                                max: 6.0,
+                                                divisions: 5,
+                                                label: "Posición: ${_value.round().toString()}",
+                                                onChanged: (val) {
+                                                  state(() {
+                                                    _value = val;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                          ),
                                           Text(
                                             "Colores",
                                             style: TextStyle(
