@@ -33,6 +33,7 @@ class ProfileTab extends StatefulWidget {
 
 class _ProfileTabState extends State<ProfileTab> {
   String title = 'loading...';
+  double position = 0.0;
   String type = 'loading...';
   String lastUsed = 'loading...';
   List<String> colors = [];
@@ -101,8 +102,8 @@ class _ProfileTabState extends State<ProfileTab> {
         ),
         body: StreamBuilder<List<String>>(
           stream: UserController.isSignedInWithGoogle
-              ? ImagesStorage.getImagesCollection(UserController.userId)
-              : ImagesStorage.getImagesCollection(FirebaseAuthService.userId),
+              ? FirestoreImg.getImagesCollection(UserController.userId)
+              : FirestoreImg.getImagesCollection(FirebaseAuthService.userId),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<String> base64Strings = snapshot.data!;
@@ -121,40 +122,46 @@ class _ProfileTabState extends State<ProfileTab> {
                   return RawMaterialButton(
                     onPressed: () async {
                       var getTile;
+                      var getPosition;
                       var getType;
                       var getLastUsed;
                       List<String> colorsList;
                       List<dynamic> getRGBA;
                       List<dynamic> listDynamic;
                       if (UserController.isSignedInWithGoogle) {
-                        getTile = await ImagesStorage.getFirestoreInfo(
+                        getTile = await FirestoreImg.getFirestoreInfo(
                             UserController.userId, index, "title");
-                        getType = await ImagesStorage.getFirestoreInfo(
+                        getPosition = await FirestoreImg.getFirestoreInfo(
+                            UserController.userId, index, "position");
+                        getType = await FirestoreImg.getFirestoreInfo(
                             UserController.userId, index, "type");
-                        getLastUsed = await ImagesStorage.getFirestoreInfo(
+                        getLastUsed = await FirestoreImg.getFirestoreInfo(
                             UserController.userId, index, "lastUsed");
-                        getRGBA = await ImagesStorage.getFirestoreInfo(
+                        getRGBA = await FirestoreImg.getFirestoreInfo(
                             UserController.userId, index, "RGBA");
-                        listDynamic = await ImagesStorage.getFirestoreInfo(
+                        listDynamic = await FirestoreImg.getFirestoreInfo(
                             UserController.userId, index, "colors");
                         colorsList =
                             listDynamic.map((e) => e.toString()).toList();
                       } else {
-                        getTile = await ImagesStorage.getFirestoreInfo(
+                        getTile = await FirestoreImg.getFirestoreInfo(
                             FirebaseAuthService.userId, index, "title");
-                        getType = await ImagesStorage.getFirestoreInfo(
+                        getPosition = await FirestoreImg.getFirestoreInfo(
+                            FirebaseAuthService.userId, index, "position");
+                        getType = await FirestoreImg.getFirestoreInfo(
                             FirebaseAuthService.userId, index, "type");
-                        getLastUsed = await ImagesStorage.getFirestoreInfo(
+                        getLastUsed = await FirestoreImg.getFirestoreInfo(
                             FirebaseAuthService.userId, index, "lastUsed");
-                        getRGBA = await ImagesStorage.getFirestoreInfo(
+                        getRGBA = await FirestoreImg.getFirestoreInfo(
                             FirebaseAuthService.userId, index, "RGBA");
-                        listDynamic = await ImagesStorage.getFirestoreInfo(
+                        listDynamic = await FirestoreImg.getFirestoreInfo(
                             FirebaseAuthService.userId, index, "colors");
                         colorsList =
                             listDynamic.map((e) => e.toString()).toList();
                       }
                       setState(() {
                         title = getTile;
+                        position = getPosition;
                         type = getType;
                         lastUsed = getLastUsed;
                         colors = colorsList;
@@ -215,13 +222,13 @@ class _ProfileTabState extends State<ProfileTab> {
                                                 onPressed: () {
                                                   if (UserController
                                                       .isSignedInWithGoogle) {
-                                                    ImagesStorage
+                                                    FirestoreImg
                                                         .deleteFirestoreItem(
                                                         UserController
                                                             .userId,
                                                         index.toString());
                                                   } else {
-                                                    ImagesStorage
+                                                    FirestoreImg
                                                         .deleteFirestoreItem(
                                                         FirebaseAuthService
                                                             .userId,
@@ -364,6 +371,38 @@ class _ProfileTabState extends State<ProfileTab> {
                                               padding: EdgeInsets.only(
                                                   top: 40, left: 20)),
                                           Text(
+                                            "Posición actual:".toUpperCase(),
+                                            style: GoogleFonts.inriaSans(
+                                              color: Colors.black38,
+                                              fontSize: 17,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    StatefulBuilder(
+                                      builder: (context, state) => Center(
+                                        child: Slider(
+                                          activeColor: DefaultAccentColor.accentPressed,
+                                          value: position,
+                                          min: 1.0,
+                                          max: 6.0,
+                                          divisions: 5,
+                                          label: "Posición: ${position.round().toString()}",
+                                          onChanged: (val) {
+                                            state(() {
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    IntrinsicWidth(
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 40, left: 20)),
+                                          Text(
                                             "COLORES:",
                                             style: GoogleFonts.inriaSans(
                                               color: Colors.black38,
@@ -440,7 +479,7 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 }
 
-class ImagesStorage {
+class FirestoreImg {
   static Stream<List<String>> getImagesCollection(String? userId) {
     final userDocRef =
         FirebaseFirestore.instance.collection("images").doc(userId);

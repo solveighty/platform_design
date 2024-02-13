@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -58,7 +59,10 @@ class _SongsTabState extends State<SongsTab> {
     });
   }
 
-  void sendSugerir() {
+  void sendSugerir() async{
+
+
+
     final sugerirMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -87,11 +91,23 @@ class _SongsTabState extends State<SongsTab> {
   }
 
   void sendPrompt() async {
+    final userDocRef;
+    if(UserController.isSignedInWithGoogle)
+      userDocRef = FirebaseFirestore.instance.collection("images").doc(UserController.userId);
+    else userDocRef = FirebaseFirestore.instance.collection("images").doc(FirebaseAuthService.userId);
+    DocumentSnapshot snapshot = await userDocRef.get();
+
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+    List<String> currentTitles = [];
+    data.forEach((key, value) {
+      currentTitles.add(value['title'].toString());
+    });
     var url = Uri.parse('https://asistentedemoda.loophole.site/api/generate');
     String nombre = 'Andrew';
     Map params = {
       'model': 'moda',
-      'prompt': 'Hola, me llamo $nombre',
+      'prompt': 'Hola, me llamo $nombre, estas son mis prendas a disponibilidad $currentTitles, por favor sugiereme que ponerme para hoy',
       'stream': false
     };
     var body = json.encode(params);
@@ -108,7 +124,21 @@ class _SongsTabState extends State<SongsTab> {
     _addMessage(promptMessage);
   }
 
-  void sendCombinacion(String title) {
+  void sendCombinacion(String title) async {
+    final userDocRef;
+    if(UserController.isSignedInWithGoogle)
+    userDocRef = FirebaseFirestore.instance.collection("images").doc(UserController.userId);
+    else userDocRef = FirebaseFirestore.instance.collection("images").doc(FirebaseAuthService.userId);
+    DocumentSnapshot snapshot = await userDocRef.get();
+
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+    List<String> currentTitles = [];
+    data.forEach((key, value) {
+      currentTitles.add(value['title'].toString());
+    });
+
+    sendUserPrompt("¿Con que podría combinar la siguiente prenda de ropa? $title estas son las prendas que tengo disponibles: ${currentTitles}");
     String highlightedTitle = '👚' + title + '👚';
     final sugerirMessage = types.TextMessage(
       author: _user,
@@ -317,9 +347,9 @@ class _SongsTabState extends State<SongsTab> {
                                     StreamBuilder<List<String>>(
                                       stream: UserController
                                           .isSignedInWithGoogle
-                                          ? ImagesStorage.getImagesCollection(
+                                          ? FirestoreImg.getImagesCollection(
                                           UserController.userId)
-                                          : ImagesStorage.getImagesCollection(
+                                          : FirestoreImg.getImagesCollection(
                                           FirebaseAuthService.userId),
                                       builder: (context, snapshot) {
                                         if (snapshot.hasData) {
@@ -340,10 +370,10 @@ class _SongsTabState extends State<SongsTab> {
                                                   onPressed: () async {
                                                     var getTile;
                                                     if (UserController.isSignedInWithGoogle) {
-                                                      getTile = await ImagesStorage.getFirestoreInfo(
+                                                      getTile = await FirestoreImg.getFirestoreInfo(
                                                           UserController.userId, index, "title");
                                                     } else {
-                                                      getTile = await ImagesStorage.getFirestoreInfo(
+                                                      getTile = await FirestoreImg.getFirestoreInfo(
                                                           FirebaseAuthService.userId, index, "title");
                                                     }
                                                     setState(() {

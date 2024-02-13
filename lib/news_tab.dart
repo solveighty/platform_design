@@ -14,6 +14,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:platform_design/profile_tab.dart';
 import 'package:platform_design/request_data.dart';
 import 'package:platform_design/src/pages/google_auth.dart';
 import 'package:platform_design/utils.dart';
@@ -307,6 +308,8 @@ class _NewsTabState extends State<NewsTab> {
                                                       onPressed: () async {
                                                         if (UserController
                                                             .isSignedInWithGoogle) {
+
+
                                                           FirebaseFirestore.instance
                                                               .collection('images')
                                                               .doc(
@@ -314,6 +317,7 @@ class _NewsTabState extends State<NewsTab> {
                                                               .set({
                                                             '$itemsIndex': {
                                                               'base64img': imgBase64,
+                                                              'position': _value,
                                                               'lastUsed': 'Ayer',
                                                               'title': '$clotheTitle',
                                                               'type': '$clotheType',
@@ -322,6 +326,7 @@ class _NewsTabState extends State<NewsTab> {
                                                             }
                                                           }, SetOptions(merge: true));
                                                         } else {
+                                                          int i = 0;
                                                           FirebaseFirestore.instance
                                                               .collection('images')
                                                               .doc(
@@ -329,6 +334,7 @@ class _NewsTabState extends State<NewsTab> {
                                                               .set({
                                                             '$itemsIndex': {
                                                               'base64img': imgBase64,
+                                                              'position': _value,
                                                               'lastUsed': 'Ayer',
                                                               'title': '$clotheTitle',
                                                               'type': '$clotheType',
